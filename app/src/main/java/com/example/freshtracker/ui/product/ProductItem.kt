@@ -20,7 +20,7 @@ fun ProductItem(product: Product) {
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp) // Убран fillMaxWidth здесь
+                .padding(16.dp)
         ) {
             Text(text = "Название продукта: ${product.name}", fontWeight = FontWeight.Bold)
             Text(text = "Категория: ${product.category}")

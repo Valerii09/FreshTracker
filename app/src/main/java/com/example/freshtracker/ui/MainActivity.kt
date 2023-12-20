@@ -23,6 +23,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,10 +43,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.freshtracker.R
+import com.example.freshtracker.data.AppDatabase
 import com.example.freshtracker.model.Product
 import com.example.freshtracker.ui.product.AddNewProduct
 import com.example.freshtracker.ui.product.MyFabButton
 import com.example.freshtracker.ui.product.ProductList
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -54,14 +58,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             var isDialogVisible by remember { mutableStateOf(false) }
+
+            val database = AppDatabase.getDatabase(this)
+            val productDao = database.productDao()
+
             var productList by remember { mutableStateOf(emptyList<Product>()) }
 
-            // Добавление тестовых продуктов для демонстрации
-            productList = listOf(
-                Product(1, "Молоко", "01.01.2023", "Молочные продукты"),
-                Product(2, "Хлеб", "15.01.2023", "Хлебобулочные изделия"),
-                // Добавьте свои продукты
-            )
+            // Получение списка продуктов из базы данных
+            LaunchedEffect(true) {
+                productList = productDao.getAllProducts()
+            }
 
             Box(
                 modifier = Modifier
@@ -78,14 +84,18 @@ class MainActivity : ComponentActivity() {
                             isDialogVisible = false
                         },
                         onConfirmation = { name, category, expirationDate ->
-                            // Создание нового продукта и добавление его в список
-                            val newProduct = Product(
-                                id = productList.size + 1,
-                                name = name,
-                                expirationDate = expirationDate,
-                                category = category
-                            )
-                            productList = productList + newProduct
+                            // Сохранение в базу данных
+                            GlobalScope.launch {
+                                productDao.insertProduct(
+                                    Product(
+                                        name = name,
+                                        category = category,
+                                        expirationDate = expirationDate
+                                    )
+                                )
+                                // Обновление списка продуктов после добавления
+                                productList = productDao.getAllProducts()
+                            }
 
                             isDialogVisible = false
                         },
