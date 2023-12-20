@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,31 +40,42 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.freshtracker.R
 import com.example.freshtracker.model.Product
-import com.example.freshtracker.ui.product.ProductScreen
-import com.example.freshtracker.ui.theme.FreshTrackerTheme
-import com.example.freshtracker.viewModel.ProductViewModel
-import dagger.hilt.android.AndroidEntryPoint
+import com.example.freshtracker.ui.product.AddNewProduct
+import com.example.freshtracker.ui.product.MyFabButton
+
 
 
 class MainActivity : ComponentActivity() {
-    private val sampleProducts = listOf(
-        Product(1, "Молоко", "22.03.2024", "Молочные продукты"),
-        Product(2, "Хлеб", "22.03.2024", "Хлебобулочные изделия"),
-        Product(3, "Яблоки", "22.03.2024", "Фрукты")
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            FreshTrackerTheme {
-                // Прямое отображение фрагментов без использования Jetpack Navigation
-                val navController = rememberNavController()
-                Column {
-                    ProductScreen(products = sampleProducts, navController = navController)
-                    AddProductFragment()
+            var isDialogVisible by remember { mutableStateOf(false) }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black) // Установка черного цвета фона
+            ) {
+                MyFabButton {
+                    isDialogVisible = true
+                }
+
+                if (isDialogVisible) {
+                    AddNewProduct(
+                        onDismissRequest = {
+                            isDialogVisible = false
+                        },
+                        onConfirmation = { product, category, expiration ->
+                            // Обработка данных после подтверждения в диалоге
+                            isDialogVisible = false
+                        },
+                        context = this@MainActivity
+                    )
                 }
             }
         }
     }
 }
+
 
