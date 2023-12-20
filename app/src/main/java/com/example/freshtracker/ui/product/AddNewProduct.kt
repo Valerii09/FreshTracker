@@ -31,6 +31,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.freshtracker.data.AppDatabase
+import com.example.freshtracker.model.Product
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun AddNewProduct(
@@ -56,6 +60,8 @@ fun AddNewProduct(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                // Поле "Название продукта"
+                Text("Название продукта:")
                 BasicTextField(
                     value = productText,
                     onValueChange = { newProductText -> productText = newProductText },
@@ -68,6 +74,8 @@ fun AddNewProduct(
                         .padding(8.dp)
                 )
 
+                // Поле "Категория"
+                Text("Категория:")
                 BasicTextField(
                     value = categoryText,
                     onValueChange = { newCategoryText -> categoryText = newCategoryText },
@@ -80,6 +88,8 @@ fun AddNewProduct(
                         .padding(8.dp)
                 )
 
+                // Поле "Срок годности"
+                Text("Срок годности:")
                 BasicTextField(
                     value = expirationText,
                     onValueChange = { newExpirationText -> expirationText = newExpirationText },
@@ -106,11 +116,22 @@ fun AddNewProduct(
 
                     TextButton(
                         onClick = {
-                            onConfirmation(
-                                productText.text,
-                                categoryText.text,
-                                expirationText.text
-                            )
+                            onConfirmation(productText.text, categoryText.text, expirationText.text)
+
+                            // Сохранение в базу данных с использованием Room
+                            val database = AppDatabase.getDatabase(context)
+                            val productDao = database.productDao()
+
+                            GlobalScope.launch {
+                                productDao.insertProduct(
+                                    Product(
+                                        name = productText.text,
+                                        category = categoryText.text,
+                                        expirationDate = expirationText.text
+                                    )
+                                )
+                            }
+
                             // Вывести введенные тексты на экран
                             Toast.makeText(
                                 context,
@@ -127,6 +148,7 @@ fun AddNewProduct(
         }
     }
 }
+
 @Preview
 @Composable
 fun AddNewProductPreview() {
