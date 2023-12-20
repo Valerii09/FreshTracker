@@ -39,6 +39,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.freshtracker.R
 import com.example.freshtracker.model.Product
+import com.example.freshtracker.ui.product.ProductScreen
 import com.example.freshtracker.ui.theme.FreshTrackerTheme
 import com.example.freshtracker.viewModel.ProductViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,68 +67,3 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun ProductScreen(productViewModel: ProductViewModel = viewModel(), products: List<Product>, navController: NavController) {
-    val productName by rememberUpdatedState("")
-    val expirationDate by rememberUpdatedState("")
-    val category by rememberUpdatedState("")
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        // UI для отображения списка продуктов
-        ProductList(products = products)
-
-        // Добавляем FloatingActionButton
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp)
-        ) {
-
-            FloatingActionButton(
-                onClick = {
-                    // Открываем диалог или другой UI для ввода нового продукта
-                    // Здесь можно использовать MaterialDialog, BottomSheetDialog или другие компоненты
-                },
-                modifier = Modifier
-                    .size(100.dp)
-                    .padding(16.dp)
-                    .clip(CircleShape)
-                    .align(Alignment.BottomEnd)
-                    .clickable { /* handle click here */ },
-                contentColor = Color.White
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Добавить продукт",
-                    modifier = Modifier.size(48.dp),
-                    tint = Color.White
-                )
-            }
-        }
-    }
-}
-
-
-@Composable
-fun ProductList(products: List<Product>) {
-    LazyColumn {
-        items(products) { product ->
-            // UI для отображения каждого продукта в списке
-            Text(text = "${product.name}, Срок годности: ${product.expirationDate}, Категория: ${product.category}")
-        }
-    }
-}
-
-@Composable
-@Preview
-fun ProductScreenPreview() {
-    val sampleProducts = listOf(
-        Product(1, "Молоко", "22.03.2024", "Молочные продукты"),
-        Product(2, "Хлеб", "22.03.2024", "Хлебобулочные изделия"),
-        Product(3, "Яблоки", "22.03.2024", "Фрукты")
-    )
-    val navController = rememberNavController()  // Создаем NavController
-    ProductScreen(navController = navController, products = sampleProducts)
-}
