@@ -9,13 +9,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -42,7 +45,7 @@ import com.example.freshtracker.R
 import com.example.freshtracker.model.Product
 import com.example.freshtracker.ui.product.AddNewProduct
 import com.example.freshtracker.ui.product.MyFabButton
-
+import com.example.freshtracker.ui.product.ProductList
 
 
 class MainActivity : ComponentActivity() {
@@ -51,11 +54,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             var isDialogVisible by remember { mutableStateOf(false) }
+            var productList by remember { mutableStateOf(emptyList<Product>()) }
+
+            // Добавление тестовых продуктов для демонстрации
+            productList = listOf(
+                Product(1, "Молоко", "01.01.2023", "Молочные продукты"),
+                Product(2, "Хлеб", "15.01.2023", "Хлебобулочные изделия"),
+                // Добавьте свои продукты
+            )
 
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black) // Установка черного цвета фона
+                    .background(Color.White)
             ) {
                 MyFabButton {
                     isDialogVisible = true
@@ -66,16 +77,28 @@ class MainActivity : ComponentActivity() {
                         onDismissRequest = {
                             isDialogVisible = false
                         },
-                        onConfirmation = { product, category, expiration ->
-                            // Обработка данных после подтверждения в диалоге
+                        onConfirmation = { name, category, expirationDate ->
+                            // Создание нового продукта и добавление его в список
+                            val newProduct = Product(
+                                id = productList.size + 1,
+                                name = name,
+                                expirationDate = expirationDate,
+                                category = category
+                            )
+                            productList = productList + newProduct
+
                             isDialogVisible = false
                         },
                         context = this@MainActivity
                     )
                 }
+
+                // Отображение списка продуктов
+                ProductList(products = productList)
             }
         }
     }
 }
+
 
 
