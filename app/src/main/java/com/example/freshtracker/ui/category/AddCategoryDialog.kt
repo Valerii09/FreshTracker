@@ -1,6 +1,7 @@
 package com.example.freshtracker.ui.category
 
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -36,16 +37,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.freshtracker.model.Category
-import com.example.freshtracker.model.Product
-import com.example.freshtracker.ui.product.CategoryDropdownMenu
 import com.example.freshtracker.viewModel.ProductViewModel
+
 
 @Composable
 fun AddCategoryDialog(
     onDismissRequest: () -> Unit,
+    viewModel: ProductViewModel,
+    onCategoryAdded: () -> Unit
 ) {
-    var productText by remember { mutableStateOf(TextFieldValue()) }
-
+    var categoryText by remember { mutableStateOf(TextFieldValue()) }
     Dialog(onDismissRequest = { onDismissRequest() }) {
 
         Card(
@@ -66,8 +67,8 @@ fun AddCategoryDialog(
                 // Поле "Название продукта"
                 Text("Новая категория:")
                 BasicTextField(
-                    value = productText,
-                    onValueChange = { newProductText -> productText = newProductText },
+                    value = categoryText.text,
+                    onValueChange = { newCategoryText -> categoryText = TextFieldValue(newCategoryText) },
                     textStyle = TextStyle(fontSize = 16.sp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -75,7 +76,6 @@ fun AddCategoryDialog(
                         .background(color = Color.White)
                         .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(4.dp))
                         .padding(8.dp)
-
                 )
                 Row(
                     modifier = Modifier
@@ -89,7 +89,21 @@ fun AddCategoryDialog(
                         Text("Отменить")
                     }
                     TextButton(
-                        onClick = {},
+                        onClick = {
+                            val categoryName = categoryText.text.trim()
+                            if (categoryName.isNotEmpty()) {
+                                // Добавим логирование для отслеживания значений
+                                Log.d("AddCategoryDialog", "Adding category: $categoryName")
+
+                                // Вызывайте функцию для добавления новой категории
+                                viewModel.insertCategory(Category(name = categoryName))
+                                onCategoryAdded()
+                                onDismissRequest()
+                            } else {
+                                Log.d("AddCategoryDialog", "Category name is empty")
+                                // Можно добавить какую-то обработку пустого значения, если необходимо
+                            }
+                        },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Text("Добавить")
@@ -100,21 +114,21 @@ fun AddCategoryDialog(
     }
 }
 
-@Preview
-@Composable
-fun AddCategoryDialogPreview() {
-    var isDialogVisible by remember { mutableStateOf(false) }
-    isDialogVisible = true
-
-
-    // Вызов диалога при условии, что isDialogVisible равно true
-    if (isDialogVisible) {
-        AddCategoryDialog(
-            onDismissRequest = {
-                // Закрытие диалога
-                isDialogVisible = false
-            }
-        )
-    }
-
-}
+//@Preview
+//@Composable
+//fun AddCategoryDialogPreview() {
+//    var isDialogVisible by remember { mutableStateOf(false) }
+//    isDialogVisible = true
+//
+//
+//    // Вызов диалога при условии, что isDialogVisible равно true
+//    if (isDialogVisible) {
+//        AddCategoryDialog(
+//            onDismissRequest = {
+//                // Закрытие диалога
+//                isDialogVisible = false
+//            }
+//        )
+//    }
+//
+//}

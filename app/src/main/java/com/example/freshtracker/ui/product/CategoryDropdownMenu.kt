@@ -1,5 +1,6 @@
 package com.example.freshtracker.ui.product
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,23 +33,45 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.freshtracker.model.Category
 import com.example.freshtracker.ui.category.AddCategoryDialog
+import com.example.freshtracker.viewModel.ProductViewModel
+import kotlinx.coroutines.flow.first
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun CategoryDropdownMenu(
     categories: List<Category>,
     selectedCategory: Category?,
     onCategorySelected: (Category) -> Unit,
-    onAddCategoryClicked: () -> Unit // Добавлен обработчик нажатия для кнопки "Добавить свою категорию"
+    onAddCategoryClicked: () -> Unit,
+    viewModel: ProductViewModel// Добавлен обработчик нажатия для кнопки "Добавить свою категорию"
 ) {
 
     var isAddCategoryDialogVisible by remember { mutableStateOf(false) }
+    var updatedCategories by remember { mutableStateOf(categories) }
 
+    // Обновление State после изменения списка категорий
+    LaunchedEffect(categories) {
+        updatedCategories = categories
+    }
     // Ваш код для отображения диалога
     if (isAddCategoryDialogVisible) {
         AddCategoryDialog(
             onDismissRequest = {
                 // Закрытие диалога
                 isAddCategoryDialogVisible = false
+            },
+                    viewModel = viewModel,
+            onCategoryAdded = {
+                // Обновление списка категорий после добавления новой
+                GlobalScope.launch {
+                    val updatedCategories = viewModel.getAllCategories().first()
+                    Log.d("YourTag", "Updated Categories: $updatedCategories")
+                // Дальнейшая обработка данных
+                }
+
             }
         )
     }
@@ -123,24 +147,24 @@ fun CategoryDropdownMenu(
 
 
 
-@Preview
-@Composable
-fun CategoryDropdownMenuPreview() {
-    val categories = listOf(
-        Category(1, "Category 1"),
-        Category(2, "Category 2"),
-        Category(3, "Category 3")
-    )
-
-    var selectedCategory by remember { mutableStateOf<Category?>(null) }
-
-    CategoryDropdownMenu(
-        categories = categories,
-        selectedCategory = selectedCategory,
-        onCategorySelected = { selectedCategory = it },
-        onAddCategoryClicked = {
-            // Обработка нажатия на кнопку "Добавить свою категорию"
-            // В этом блоке вы можете вызвать дополнительные действия при добавлении категории
-        }
-    )
-}
+//@Preview
+//@Composable
+//fun CategoryDropdownMenuPreview() {
+//    val categories = listOf(
+//        Category(1, "Category 1"),
+//        Category(2, "Category 2"),
+//        Category(3, "Category 3")
+//    )
+//
+//    var selectedCategory by remember { mutableStateOf<Category?>(null) }
+//
+//    CategoryDropdownMenu(
+//        categories = categories,
+//        selectedCategory = selectedCategory,
+//        onCategorySelected = { selectedCategory = it },
+//        onAddCategoryClicked = {
+//            // Обработка нажатия на кнопку "Добавить свою категорию"
+//            // В этом блоке вы можете вызвать дополнительные действия при добавлении категории
+//        }
+//    )
+//}

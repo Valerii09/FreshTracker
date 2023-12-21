@@ -22,6 +22,16 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
     private val _categoryStateFlow = MutableStateFlow<Category?>(null)
     val categoryStateFlow: StateFlow<Category?> = _categoryStateFlow
 
+    fun insertCategory(category: Category) {
+        viewModelScope.launch {
+            repository.insertCategory(category)
+        }
+    }
+    fun getAllCategories(): Flow<List<Category>> {
+        return repository.getAllCategories()
+    }
+
+
     // Конструктор без параметров для использования в ViewModelProvider
     @Suppress("unused")
     constructor() : this(ProductRepository(getDefaultProductDao(MyApp.getContext()))) {
