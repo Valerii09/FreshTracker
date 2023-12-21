@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.freshtracker.model.Category
+import com.example.freshtracker.ui.category.AddCategoryDialog
 
 @Composable
 fun CategoryDropdownMenu(
@@ -38,6 +39,18 @@ fun CategoryDropdownMenu(
     onCategorySelected: (Category) -> Unit,
     onAddCategoryClicked: () -> Unit // Добавлен обработчик нажатия для кнопки "Добавить свою категорию"
 ) {
+
+    var isAddCategoryDialogVisible by remember { mutableStateOf(false) }
+
+    // Ваш код для отображения диалога
+    if (isAddCategoryDialogVisible) {
+        AddCategoryDialog(
+            onDismissRequest = {
+                // Закрытие диалога
+                isAddCategoryDialogVisible = false
+            }
+        )
+    }
     var expanded by remember { mutableStateOf(false) }
 
     // Основной контейнер для текстового поля и выпадающего списка
@@ -98,8 +111,7 @@ fun CategoryDropdownMenu(
                 // Элемент для кнопки "Добавить свою категорию"
                 DropdownMenuItem(
                     onClick = {
-                        onAddCategoryClicked()
-                        expanded = false
+                        isAddCategoryDialogVisible = true
                     }
                 ) {
                     Text("Добавить свою категорию")
