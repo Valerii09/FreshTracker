@@ -84,17 +84,10 @@ class MainActivity : ComponentActivity() {
                             isDialogVisible = false
                         },
                         onConfirmation = { name, category, expirationDate ->
-                            // Сохранение в базу данных
                             GlobalScope.launch {
-                                productDao.insertProduct(
-                                    Product(
-                                        name = name,
-                                        category = category,
-                                        expirationDate = expirationDate
-                                    )
-                                )
                                 // Обновление списка продуктов после добавления
                                 productList = productDao.getAllProducts()
+
                             }
 
                             isDialogVisible = false
