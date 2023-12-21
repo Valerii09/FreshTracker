@@ -23,7 +23,7 @@ fun ProductItem(product: Product) {
                 .padding(16.dp)
         ) {
             Text(text = "Название продукта: ${product.name}", fontWeight = FontWeight.Bold)
-            Text(text = "Категория: ${product.category}")
+            Text(text = "Категория: ${product.categoryId}")
             Text(text = "Срок годности: ${product.expirationDate}")
         }
     }

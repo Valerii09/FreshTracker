@@ -4,9 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.freshtracker.model.Category
 import com.example.freshtracker.model.Product
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-@Database(entities = [Product::class], version = 1, exportSchema = false)
+@Database(entities = [Product::class, Category::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun productDao(): ProductDao
@@ -21,10 +26,23 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
-                ).build()
+                ).addCallback(object : RoomDatabase.Callback() {
+                    override fun onCreate(db: SupportSQLiteDatabase) {
+                        super.onCreate(db)
+                        // Заполнение базы данных начальными категориями при первом создании
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val categoryDao = INSTANCE?.productDao()
+                            categoryDao?.insertCategory(Category(name = "Категория 1"))
+                            categoryDao?.insertCategory(Category(name = "Категория 2"))
+                            categoryDao?.insertCategory(Category(name = "Категория 33"))
+                            // Добавьте другие категории по вашему усмотрению
+                        }
+                    }
+                }).build()
                 INSTANCE = instance
                 instance
             }
         }
     }
 }
+
