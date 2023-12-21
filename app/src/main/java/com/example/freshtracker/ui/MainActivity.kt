@@ -63,8 +63,9 @@ class MainActivity : ComponentActivity() {
         AppDatabase.getDatabase(applicationContext).productDao()
     }
     private val productViewModel: ProductViewModel by viewModels {
-        ProductViewModelFactory(ProductRepository(productDao)) // предоставьте ваш ProductDao здесь
+        ProductViewModelFactory(ProductRepository(productDao))
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -76,7 +77,7 @@ class MainActivity : ComponentActivity() {
 
             var productList by remember { mutableStateOf(emptyList<Product>()) }
 
-// Получение списка продуктов из базы данных
+            // Получение списка продуктов из базы данных
             LaunchedEffect(true) {
                 // Собираем значения из Flow и преобразуем их в List
                 productDao.getAllProducts().collect { products ->
@@ -111,12 +112,13 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                // Отображение списка продуктов
-                ProductList(products = productList)
+                // Отображение списка продуктов с передачей viewModel
+                ProductList(products = productList, viewModel = viewModel)
             }
         }
     }
 }
+
 
 
 

@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
@@ -70,11 +72,13 @@ fun AddNewProduct(
     }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(375.dp)
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()), // добавлен Modifier.verticalScroll
             shape = RoundedCornerShape(16.dp),
         ) {
             Column(

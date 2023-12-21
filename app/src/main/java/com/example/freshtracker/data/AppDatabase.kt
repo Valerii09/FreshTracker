@@ -33,8 +33,9 @@ abstract class AppDatabase : RoomDatabase() {
                         CoroutineScope(Dispatchers.IO).launch {
                             val categoryDao = INSTANCE?.productDao()
                             categoryDao?.insertCategory(Category(name = "Категория 1"))
-                            categoryDao?.insertCategory(Category(name = "Категория 2"))
-                            categoryDao?.insertCategory(Category(name = "Категория 33"))
+                            categoryDao?.insertCategory(Category(name = "Категория 9"))
+                            categoryDao?.insertCategory(Category(name = "Категория 22"))
+                            categoryDao?.insertCategory(Category(name = "Категория 33333333333333333333333333333333333333333333333333333333"))
                             // Добавьте другие категории по вашему усмотрению
                         }
                     }

@@ -80,7 +80,7 @@ fun CategoryDropdownMenu(
                 expanded = true,
                 onDismissRequest = { expanded = false },
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .weight(1f)
             ) {
                 categories.forEach { category ->
                     DropdownMenuItem(

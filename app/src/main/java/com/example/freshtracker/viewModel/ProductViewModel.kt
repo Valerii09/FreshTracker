@@ -11,17 +11,27 @@ import com.example.freshtracker.data.ProductDao
 import com.example.freshtracker.data.ProductRepository
 import com.example.freshtracker.model.Category
 import com.example.freshtracker.model.Product
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ProductViewModel(private val repository: ProductRepository) : ViewModel() {
+    private val _categoryStateFlow = MutableStateFlow<Category?>(null)
+    val categoryStateFlow: StateFlow<Category?> = _categoryStateFlow
 
     // Конструктор без параметров для использования в ViewModelProvider
     @Suppress("unused")
     constructor() : this(ProductRepository(getDefaultProductDao(MyApp.getContext()))) {
         // Можете использовать дефолтные значения или заменить на подходящий код
     }
-
+    suspend fun getCategoryById(categoryId: Int): Category? {
+        return withContext(Dispatchers.IO) {
+            repository.getCategoryById(categoryId)
+        }
+    }
     // Получить все продукты в виде LiveData
     val allProducts: LiveData<List<Product>> = repository.getAllProducts().asLiveData()
 
