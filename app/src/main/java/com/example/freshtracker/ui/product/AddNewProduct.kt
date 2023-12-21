@@ -76,14 +76,15 @@ fun AddNewProduct(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(375.dp)
+                .height(400.dp)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()), // добавлен Modifier.verticalScroll
             shape = RoundedCornerShape(16.dp),
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(top = 20.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -99,6 +100,7 @@ fun AddNewProduct(
                         .background(color = Color.White)
                         .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(4.dp))
                         .padding(8.dp)
+
                 )
 
                 // Поле "Категория"
