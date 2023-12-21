@@ -3,6 +3,7 @@ package com.example.freshtracker.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,19 +45,31 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.freshtracker.R
 import com.example.freshtracker.data.AppDatabase
+import com.example.freshtracker.data.ProductDao
+import com.example.freshtracker.data.ProductRepository
 import com.example.freshtracker.model.Product
 import com.example.freshtracker.ui.product.AddNewProduct
 import com.example.freshtracker.ui.product.MyFabButton
 import com.example.freshtracker.ui.product.ProductList
+import com.example.freshtracker.viewModel.ProductViewModel
+import com.example.freshtracker.viewModel.ProductViewModelFactory
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: ProductViewModel by viewModels()
+    private val productDao: ProductDao by lazy {
+        AppDatabase.getDatabase(applicationContext).productDao()
+    }
+    private val productViewModel: ProductViewModel by viewModels {
+        ProductViewModelFactory(ProductRepository(productDao))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             var isDialogVisible by remember { mutableStateOf(false) }
 
             val database = AppDatabase.getDatabase(this)
@@ -66,7 +79,10 @@ class MainActivity : ComponentActivity() {
 
             // Получение списка продуктов из базы данных
             LaunchedEffect(true) {
-                productList = productDao.getAllProducts()
+                // Собираем значения из Flow и преобразуем их в List
+                productDao.getAllProducts().collect { products ->
+                    productList = products
+                }
             }
 
             Box(
@@ -79,30 +95,30 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (isDialogVisible) {
+
+                    // Использование AddNewProduct
                     AddNewProduct(
                         onDismissRequest = {
                             isDialogVisible = false
                         },
                         onConfirmation = { name, category, expirationDate ->
-
-
                             isDialogVisible = false
                         },
-                        context = this@MainActivity,
-                        products = productList,
                         onProductListUpdate = { updatedList ->
                             // Обновление списка продуктов после изменения
                             productList = updatedList
-                        }
+                        },
+                        viewModel = viewModel
                     )
                 }
 
-                // Отображение списка продуктов
-                ProductList(products = productList)
+                // Отображение списка продуктов с передачей viewModel
+                ProductList(products = productList, viewModel = viewModel)
             }
         }
     }
 }
+
 
 
 
