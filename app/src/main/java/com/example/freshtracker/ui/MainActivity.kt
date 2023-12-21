@@ -84,15 +84,16 @@ class MainActivity : ComponentActivity() {
                             isDialogVisible = false
                         },
                         onConfirmation = { name, category, expirationDate ->
-                            GlobalScope.launch {
-                                // Обновление списка продуктов после добавления
-                                productList = productDao.getAllProducts()
 
-                            }
 
                             isDialogVisible = false
                         },
-                        context = this@MainActivity
+                        context = this@MainActivity,
+                        products = productList,
+                        onProductListUpdate = { updatedList ->
+                            // Обновление списка продуктов после изменения
+                            productList = updatedList
+                        }
                     )
                 }
 
@@ -102,6 +103,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 
 

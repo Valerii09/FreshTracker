@@ -40,7 +40,9 @@ import kotlinx.coroutines.launch
 fun AddNewProduct(
     onDismissRequest: () -> Unit,
     onConfirmation: (String, String, String) -> Unit, // Добавлены параметры продукта, категории и срока годности
-    context: Context
+    context: Context,
+    products: List<Product>, // Добавлен список продуктов
+    onProductListUpdate: (List<Product>) -> Unit // Добавлен колбэк для обновления списка продуктов
 ) {
     var productText by remember { mutableStateOf(TextFieldValue()) }
     var categoryText by remember { mutableStateOf(TextFieldValue()) }
@@ -123,13 +125,17 @@ fun AddNewProduct(
                             val productDao = database.productDao()
 
                             GlobalScope.launch {
-                                productDao.insertProduct(
-                                    Product(
-                                        name = productText.text,
-                                        category = categoryText.text,
-                                        expirationDate = expirationText.text
-                                    )
+                                val newProduct = Product(
+                                    name = productText.text,
+                                    category = categoryText.text,
+                                    expirationDate = expirationText.text
                                 )
+
+                                productDao.insertProduct(newProduct)
+
+                                // Обновление списка продуктов и вызов колбэка
+                                val updatedProducts = productDao.getAllProducts()
+                                onProductListUpdate(updatedProducts)
                             }
 
                             // Вывести введенные тексты на экран
@@ -140,7 +146,7 @@ fun AddNewProduct(
                             ).show()
                         },
                         modifier = Modifier.padding(8.dp),
-                    ) {
+                    )  {
                         Text("Сохранить")
                     }
                 }
@@ -153,12 +159,20 @@ fun AddNewProduct(
 @Composable
 fun AddNewProductPreview() {
     val context = LocalContext.current
+    var productList by remember { mutableStateOf(emptyList<Product>()) }
 
     AddNewProduct(
         onDismissRequest = { /* Handle dismiss request */ },
         onConfirmation = { product, category, expiration ->
             /* Handle confirmation with the entered values */
+            // Необходимо обновить productList для отображения нового продукта
+            productList = productList + Product(name = product, category = category, expirationDate = expiration)
         },
-        context = context
+        context = context,
+        products = productList,
+        onProductListUpdate = { updatedList ->
+            // Обновить productList с обновленным списком продуктов
+            productList = updatedList
+        }
     )
 }
