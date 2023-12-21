@@ -107,9 +107,15 @@ fun AddNewProduct(
                 Text("Категория:")
 
                 // Текстовое поле, которое раскрывает список при нажатии
-                CategoryDropdownMenu(categories, selectedCategory) { category ->
-                    selectedCategory = category
-                }
+                CategoryDropdownMenu(
+                    categories = categories,
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { selectedCategory = it },
+                    onAddCategoryClicked = {
+                        // Обработка нажатия на кнопку "Добавить свою категорию"
+                        // В этом блоке вы можете вызвать дополнительные действия при добавлении категории
+                    }
+                )
 
                 // Поле "Срок годности"
                 Text("Срок годности:")

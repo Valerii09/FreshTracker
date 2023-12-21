@@ -35,7 +35,8 @@ import com.example.freshtracker.model.Category
 fun CategoryDropdownMenu(
     categories: List<Category>,
     selectedCategory: Category?,
-    onCategorySelected: (Category) -> Unit
+    onCategorySelected: (Category) -> Unit,
+    onAddCategoryClicked: () -> Unit // Добавлен обработчик нажатия для кнопки "Добавить свою категорию"
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -82,6 +83,7 @@ fun CategoryDropdownMenu(
                 modifier = Modifier
                     .weight(1f)
             ) {
+                // Элементы для категорий
                 categories.forEach { category ->
                     DropdownMenuItem(
                         onClick = {
@@ -92,10 +94,21 @@ fun CategoryDropdownMenu(
                         Text(category.name)
                     }
                 }
+
+                // Элемент для кнопки "Добавить свою категорию"
+                DropdownMenuItem(
+                    onClick = {
+                        onAddCategoryClicked()
+                        expanded = false
+                    }
+                ) {
+                    Text("Добавить свою категорию")
+                }
             }
         }
     }
 }
+
 
 
 @Preview
@@ -112,6 +125,10 @@ fun CategoryDropdownMenuPreview() {
     CategoryDropdownMenu(
         categories = categories,
         selectedCategory = selectedCategory,
-        onCategorySelected = { selectedCategory = it }
+        onCategorySelected = { selectedCategory = it },
+        onAddCategoryClicked = {
+            // Обработка нажатия на кнопку "Добавить свою категорию"
+            // В этом блоке вы можете вызвать дополнительные действия при добавлении категории
+        }
     )
 }
