@@ -1,6 +1,7 @@
 package com.example.freshtracker.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -114,10 +115,12 @@ class MainActivity : ComponentActivity() {
 
                 // Отображение списка продуктов с передачей viewModel
                 ProductList(products = productList, viewModel = viewModel)
+                Log.d("DatabaseLog", "Saving product: $productList")
             }
         }
     }
 }
+
 
 
 
