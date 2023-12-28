@@ -46,7 +46,6 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProduct(
     product: Product,
@@ -69,9 +68,11 @@ fun EditProduct(
         // Дождаться, пока LiveData будет иметь данные
         if (categories.isNotEmpty()) {
             selectedCategory = categories.firstOrNull { it.id == product.categoryId }
+            editedProduct = editedProduct.copy(categoryId = selectedCategory?.id ?: 0)
+            Log.d("DebugLog", "Selected Category: $selectedCategory")
         }
     }
-
+    Log.d("DebugLog", "Categories: $categories")
     Dialog(onDismissRequest = { onDismissRequest() }) {
 
         Card(
@@ -89,6 +90,8 @@ fun EditProduct(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Log.d("DebugLog", "Selected Category2: $selectedCategory")
+                Log.d("DebugLog", "Categories2: $categories")
                 // Поле "Название продукта"
                 Text("Название продукта:")
                 BasicTextField(
@@ -112,7 +115,8 @@ fun EditProduct(
                 CategoryDropdownMenu(
                     categories = categories,
                     selectedCategory = selectedCategory,
-                    onCategorySelected = { selectedCategory = it },
+                    onCategorySelected = { selectedCategory = it
+                        },
                     onAddCategoryClicked = {
                         // Обработка нажатия на кнопку "Добавить свою категорию"
                         // В этом блоке вы можете вызвать дополнительные действия при добавлении категории

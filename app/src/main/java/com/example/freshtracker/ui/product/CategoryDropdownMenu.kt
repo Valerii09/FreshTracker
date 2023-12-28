@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,16 +47,13 @@ fun CategoryDropdownMenu(
     selectedCategory: Category?,
     onCategorySelected: (Category) -> Unit,
     onAddCategoryClicked: () -> Unit,
-    viewModel: ProductViewModel// Добавлен обработчик нажатия для кнопки "Добавить свою категорию"
+    viewModel: ProductViewModel
 ) {
-
     var isAddCategoryDialogVisible by remember { mutableStateOf(false) }
-    var updatedCategories by remember { mutableStateOf(categories) }
 
     // Обновление State после изменения списка категорий
-    LaunchedEffect(categories) {
-        updatedCategories = categories
-    }
+    val updatedCategories by viewModel.allCategories.observeAsState(categories)
+
     // Ваш код для отображения диалога
     if (isAddCategoryDialogVisible) {
         AddCategoryDialog(
@@ -63,18 +61,16 @@ fun CategoryDropdownMenu(
                 // Закрытие диалога
                 isAddCategoryDialogVisible = false
             },
-                    viewModel = viewModel,
+            viewModel = viewModel,
             onCategoryAdded = {
                 // Обновление списка категорий после добавления новой
-                GlobalScope.launch {
-                    val updatedCategories = viewModel.getAllCategories().first()
-                    Log.d("YourTag", "Updated Categories: $updatedCategories")
+                // Нет необходимости использовать GlobalScope.launch, так как мы находимся внутри Composable
+                Log.d("YourTag", "Updated Categories: $updatedCategories")
                 // Дальнейшая обработка данных
-                }
-
             }
         )
     }
+
     var expanded by remember { mutableStateOf(false) }
 
     // Основной контейнер для текстового поля и выпадающего списка
@@ -121,7 +117,7 @@ fun CategoryDropdownMenu(
                     .weight(1f)
             ) {
                 // Элементы для категорий
-                categories.forEach { category ->
+                updatedCategories?.forEach { category ->
                     DropdownMenuItem(
                         onClick = {
                             onCategorySelected(category)

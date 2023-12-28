@@ -38,7 +38,6 @@ fun ProductList(products: List<Product>, viewModel: ProductViewModel, modifier: 
                     product = product,
                     onDismissRequest = { showDialog = false },
                     onConfirmation = { editedProduct ->
-                        // Обработка редактирования продукта, например, вызов viewModel.updateProduct(editedProduct)
                         showDialog = false
                     },
                     viewModel = viewModel

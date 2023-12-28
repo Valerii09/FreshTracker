@@ -11,10 +11,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,10 +29,13 @@ import java.util.Locale
 
 @Composable
 fun ProductItem(product: Product, viewModel: ProductViewModel, onEditClick: () -> Unit) {
-    val category by produceState<Category?>(initialValue = null) {
-        value = viewModel.getCategoryById(product.categoryId)
-    }
+    // Используйте produceState для автоматического обновления Composable
+    var category by remember { mutableStateOf<Category?>(null) }
 
+    // Используем LaunchedEffect для вызова getCategoryById из корутины
+    LaunchedEffect(product.categoryId) {
+        category = viewModel.getCategoryById(product.categoryId)
+    }
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     val formattedDate = dateFormat.format(product.expirationDate)
 
