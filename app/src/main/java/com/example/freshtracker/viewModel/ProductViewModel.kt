@@ -22,6 +22,18 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
     private val _categoryStateFlow = MutableStateFlow<Category?>(null)
     val categoryStateFlow: StateFlow<Category?> = _categoryStateFlow
 
+    fun updateProduct(product: Product) {
+        viewModelScope.launch {
+            repository.updateProduct(product)
+        }
+    }
+    fun deleteProduct(product: Product) {
+        viewModelScope.launch {
+            repository.deleteProduct(product)
+        }
+    }
+
+
     fun insertCategory(category: Category) {
         viewModelScope.launch {
             repository.insertCategory(category)

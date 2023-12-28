@@ -1,9 +1,11 @@
 package com.example.freshtracker.data
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.freshtracker.model.Category
 import com.example.freshtracker.model.Product
 import kotlinx.coroutines.flow.Flow
@@ -26,5 +28,11 @@ interface ProductDao {
 
     @Query("SELECT * FROM categories WHERE id = :categoryId")
     suspend fun getCategoryById(categoryId: Int): Category?
+
+    @Update
+    suspend fun updateProduct(product: Product)
+
+    @Delete
+    suspend fun deleteProduct(product: Product)
 
 }
