@@ -54,7 +54,7 @@ fun EditProduct(
     onConfirmation: (Product) -> Unit,
     viewModel: ProductViewModel,
 ) {
-
+    val expirationDateTransformation = ExpirationDateVisualTransformation()
     var editedProduct by remember { mutableStateOf(product.copy()) }
     var expirationText by remember { mutableStateOf(TextFieldValue(SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(product.expirationDate))) }
 
@@ -141,7 +141,7 @@ fun EditProduct(
                     ,
                     keyboardOptions = KeyboardOptions (keyboardType = KeyboardType.Number,
                     ),
-                    visualTransformation = ExpirationDateVisualTransformation()
+                    visualTransformation = expirationDateTransformation
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -164,6 +164,7 @@ fun EditProduct(
                         onClick = {
                             try {
                                 val expirationDate = try {
+                                    Log.d("DateLog", "Entered Date: ${expirationText.text}")
                                     // Проверяем формат даты
                                     if (isValidDate(expirationText.text)) {
                                         val dateFormat = SimpleDateFormat("ddMMyyyy", Locale.getDefault())

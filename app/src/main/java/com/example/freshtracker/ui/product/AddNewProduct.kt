@@ -56,7 +56,7 @@ fun AddNewProduct(
     onProductListUpdate: (List<Product>) -> Unit,
     viewModel: ProductViewModel,
 ) {
-
+    val expirationDateTransformation = ExpirationDateVisualTransformation()
     var productText by remember { mutableStateOf(TextFieldValue()) }
     var expirationText by remember { mutableStateOf(TextFieldValue()) }
 
@@ -140,7 +140,7 @@ fun AddNewProduct(
                     ,
                             keyboardOptions = KeyboardOptions (keyboardType = KeyboardType.Number,
                 ),
-                visualTransformation = ExpirationDateVisualTransformation()
+                visualTransformation = expirationDateTransformation
                 )
 
                 Row(

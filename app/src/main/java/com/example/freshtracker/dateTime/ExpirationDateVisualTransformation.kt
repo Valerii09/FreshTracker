@@ -10,8 +10,8 @@ class ExpirationDateVisualTransformation : VisualTransformation {
         val trimmed = text.text.trim()
         val digitsOnly = trimmed.filter { it.isDigit() }
 
-        if (digitsOnly.length > 10) {
-            // Если длина строки превышает 10 символов, не обрабатывать ввод
+        if (digitsOnly.length > 8) {
+            // Если длина строки превышает 8 символов, не обрабатывать ввод
             return TransformedText(AnnotatedString(digitsOnly), OffsetMapping.Identity)
         }
 
@@ -38,7 +38,6 @@ class ExpirationDateVisualTransformation : VisualTransformation {
             }
         }
 
-
         return transformedText
     }
 }
@@ -47,13 +46,18 @@ class DateOffsetMapping : OffsetMapping {
     override fun originalToTransformed(offset: Int): Int {
         return when {
             offset <= 2 -> offset // в пределах дня
-            offset <= 5 -> 3 // в пределах месяца, перескакиваем в конец дня
-            else -> 6 // в пределах года, перескакиваем в конец месяца
+            offset <= 5 -> offset + 1 // в пределах месяца, увеличиваем на 1
+            else -> offset + 2 // в пределах года, увеличиваем на 2
         }
     }
 
     override fun transformedToOriginal(offset: Int): Int {
-        return offset
+        return when {
+            offset <= 2 -> offset // в пределах дня
+            offset <= 5 -> 5 // в пределах месяца, возвращаем конец дня
+            else -> 8 // в пределах года, возвращаем конец месяца
+        }
     }
 }
+
 
