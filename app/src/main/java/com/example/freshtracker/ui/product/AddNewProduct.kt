@@ -1,10 +1,8 @@
 package com.example.freshtracker.ui.product
 
-import android.content.Context
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,14 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -32,28 +28,35 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.freshtracker.data.AppDatabase
+import com.example.freshtracker.dateTime.ExpirationDateVisualTransformation
+import com.example.freshtracker.dateTime.isValidDate
+
+
 import com.example.freshtracker.model.Category
 import com.example.freshtracker.model.Product
 import com.example.freshtracker.viewModel.ProductViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun AddNewProduct(
     onDismissRequest: () -> Unit,
     onConfirmation: (String, Int, String) -> Unit,
     onProductListUpdate: (List<Product>) -> Unit,
-    viewModel: ProductViewModel
+    viewModel: ProductViewModel,
 ) {
+
     var productText by remember { mutableStateOf(TextFieldValue()) }
     var expirationText by remember { mutableStateOf(TextFieldValue()) }
 
@@ -122,7 +125,11 @@ fun AddNewProduct(
                 Text("Срок годности:")
                 BasicTextField(
                     value = expirationText,
-                    onValueChange = { newExpirationText -> expirationText = newExpirationText },
+                    onValueChange = { newExpirationText ->
+                        if (newExpirationText.text.length <= 8) {
+                            expirationText = newExpirationText
+                        }
+                    },
                     textStyle = TextStyle(fontSize = 16.sp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -130,6 +137,10 @@ fun AddNewProduct(
                         .background(color = Color.White)
                         .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(4.dp))
                         .padding(8.dp)
+                    ,
+                            keyboardOptions = KeyboardOptions (keyboardType = KeyboardType.Number,
+                ),
+                visualTransformation = ExpirationDateVisualTransformation()
                 )
 
                 Row(
@@ -138,11 +149,54 @@ fun AddNewProduct(
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     TextButton(
-                        onClick = onDismissRequest,
+                        onClick = {
+                            try {
+                                val expirationDate = try {
+                                    // Проверяем формат даты
+                                    if (isValidDate(expirationText.text)) {
+                                        val dateFormat = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+                                        val parsedDate = dateFormat.parse(expirationText.text)
+                                        parsedDate ?: throw ParseException("Неверный формат даты", 0)
+                                    } else {
+                                        throw ParseException("Неверный формат даты", 0)
+                                    }
+                                } catch (e: ParseException) {
+                                    e.printStackTrace()
+                                    null
+                                }
+
+                                expirationDate?.let {
+                                    Log.d("DateLog", "Formatted Date: ${SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(it)}")
+                                    onConfirmation(
+                                        productText.text,
+                                        selectedCategory?.id ?: 0,
+                                        SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(it)
+                                    )
+                                } ?: run {
+                                    Log.d("DateLog", "Expiration Date is null")
+                                    // Обработка ошибки ввода неверного формата даты
+                                    // Можно добавить визуальное оповещение пользователю
+                                    // или другую логику обработки ошибки
+                                }
+
+                                // Сохранение в базу данных с использованием Room
+                                // Обновление списка продуктов и вызов колбэка
+                                viewModel.insertProduct(
+                                    Product(
+                                        name = productText.text,
+                                        categoryId = selectedCategory?.id ?: 0,
+                                        expirationDate = expirationDate ?: Date()
+                                    )
+                                )
+                            } catch (e: Exception) {
+                                Log.e("ErrorLog", "An error occurred: ${e.message}", e)
+                            }
+                        },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Text("Отменить")
                     }
+
                     TextButton(
                         onClick = {
                             onConfirmation(
@@ -157,7 +211,10 @@ fun AddNewProduct(
                                 Product(
                                     name = productText.text,
                                     categoryId = selectedCategory?.id ?: 0,
-                                    expirationDate = expirationText.text
+                                    expirationDate = SimpleDateFormat(
+                                        "ddMMyyyy",
+                                        Locale.getDefault()
+                                    ).parse(expirationText.text) ?: Date()
                                 )
                             )
                         },
@@ -170,7 +227,6 @@ fun AddNewProduct(
         }
     }
 }
-
 
 
 //@Preview

@@ -16,12 +16,17 @@ import androidx.compose.ui.unit.dp
 import com.example.freshtracker.model.Category
 import com.example.freshtracker.model.Product
 import com.example.freshtracker.viewModel.ProductViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun ProductItem(product: Product, viewModel: ProductViewModel) {
     val category by produceState<Category?>(initialValue = null) {
         value = viewModel.getCategoryById(product.categoryId)
     }
+
+    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    val formattedDate = dateFormat.format(product.expirationDate)
 
     Card(
         modifier = Modifier
@@ -34,7 +39,8 @@ fun ProductItem(product: Product, viewModel: ProductViewModel) {
         ) {
             Text(text = "Название продукта: ${product.name}", fontWeight = FontWeight.Bold)
             Text(text = "Категория: ${category?.name ?: "Unknown Category"}")
-            Text(text = "Срок годности: ${product.expirationDate}")
+            Text(text = "Срок годности: $formattedDate")
         }
     }
 }
+
