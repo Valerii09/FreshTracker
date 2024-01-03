@@ -25,4 +25,5 @@ class ProductRepository(private val productDao: ProductDao) {
     suspend fun deleteProduct(product: Product) {
         productDao.deleteProduct(product)
     }
+
 }

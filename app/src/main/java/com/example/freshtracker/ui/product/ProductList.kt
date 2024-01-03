@@ -1,5 +1,7 @@
 package com.example.freshtracker.ui.product
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -19,30 +21,35 @@ import androidx.compose.ui.unit.dp
 import com.example.freshtracker.model.Product
 import com.example.freshtracker.viewModel.ProductViewModel
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun ProductList(products: List<Product>, viewModel: ProductViewModel, modifier: Modifier) {
     LazyColumn(
-        modifier = modifier.padding(top = 16.dp, bottom = 115.dp)
+        modifier = modifier.padding(top = 100.dp, bottom = 115.dp)
     ) {
-        itemsIndexed(products) { _, product ->
-            var showDialog by remember { mutableStateOf(false) }
-
-            ProductItem(
-                product = product,
-                viewModel = viewModel,
-                onEditClick = { showDialog = true }
-            )
-
-            // Отображение диалога редактирования, если showDialog равно true
-            if (showDialog) {
-                EditProduct(
+        itemsIndexed(products) { index, product ->
+            if (viewModel.searchQuery.value.isNullOrBlank() ||
+                product.name.contains(viewModel.searchQuery.value!!, ignoreCase = true)
+            ) {
+                var showDialog by remember { mutableStateOf(false) }
+                Log.d("ProductList", "Displaying product at index $index: $product")
+                ProductItem(
                     product = product,
-                    onDismissRequest = { showDialog = false },
-                    onConfirmation = { editedProduct ->
-                        showDialog = false
-                    },
-                    context = LocalContext.current, viewModel = viewModel
+                    viewModel = viewModel,
+                    onEditClick = { showDialog = true }
                 )
+
+                // Отображение диалога редактирования, если showDialog равно true
+                if (showDialog) {
+                    EditProduct(
+                        product = product,
+                        onDismissRequest = { showDialog = false },
+                        onConfirmation = { editedProduct ->
+                            showDialog = false
+                        },
+                        context = LocalContext.current, viewModel = viewModel
+                    )
+                }
             }
         }
     }

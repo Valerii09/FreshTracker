@@ -1,6 +1,7 @@
 package com.example.freshtracker.viewModel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 
 class ProductViewModel(private val repository: ProductRepository) : ViewModel() {
     private val _categoryStateFlow = MutableStateFlow<Category?>(null)
@@ -78,6 +80,41 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
             // Здесь может быть ваш код для создания ProductDao
             return AppDatabase.getDatabase(context).productDao()
         }
+    }
+
+    // Новые переменные состояния для фильтрации и поиска
+    private val _selectedCategoryId = MutableStateFlow<Int?>(null)
+    val selectedCategoryId: StateFlow<Int?> = _selectedCategoryId
+
+    private val _searchQuery = MutableStateFlow<String?>(null)
+    val searchQuery: StateFlow<String?> = _searchQuery
+
+    // Функции для обновления состояний
+    fun setSelectedCategoryId(categoryId: Int?) {
+        _selectedCategoryId.value = categoryId
+    }
+
+    fun setSearchQuery(query: String?) {
+        _searchQuery.value = query
+        Log.d("SearchPanel", "Search query set: $query")
+    }
+
+    private val _selectedDate = MutableStateFlow<LocalDate?>(null)
+    val selectedDate: StateFlow<LocalDate?> = _selectedDate
+
+    fun setSelectedDate(date: LocalDate?) {
+        _selectedDate.value = date
+    }
+
+    fun filterByCategoryAndDate(categoryId: Int?, date: LocalDate?) {
+        _selectedCategoryId.value = categoryId
+        _selectedDate.value = date
+    }
+
+    fun resetFilters() {
+        _selectedCategoryId.value = null
+        _selectedDate.value = null
+        _searchQuery.value = null
     }
 }
 

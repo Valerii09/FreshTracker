@@ -7,6 +7,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,11 +24,16 @@ import com.example.freshtracker.data.AppDatabase
 import com.example.freshtracker.data.ProductDao
 import com.example.freshtracker.data.ProductRepository
 import com.example.freshtracker.model.Product
+import com.example.freshtracker.ui.appPanel.AppPanel
 import com.example.freshtracker.ui.product.AddNewProduct
+
 import com.example.freshtracker.ui.product.MyFabButton
 import com.example.freshtracker.ui.product.ProductList
 import com.example.freshtracker.viewModel.ProductViewModel
 import com.example.freshtracker.viewModel.ProductViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -41,19 +50,41 @@ class MainActivity : ComponentActivity() {
 
             var productList by remember { mutableStateOf(emptyList<Product>()) }
 
+
             // Получение списка продуктов из базы данных
-            LaunchedEffect(true) {
-                // Собираем значения из Flow и преобразуем их в List
-                productDao.getAllProducts().collect { products ->
-                    productList = products
+            // В MainActivity
+            DisposableEffect(viewModel.selectedCategoryId, viewModel.searchQuery) {
+                val job = CoroutineScope(Dispatchers.Default).launch {
+                    productDao.getFilteredProducts(
+                        viewModel.selectedCategoryId.value,
+                        viewModel.searchQuery.value
+                    ).collect { products ->
+                        productList = products
+                        Log.d("ProductDao", "Filtered products: $products")
+                    }
+                }
+
+                onDispose {
+                    job.cancel()
                 }
             }
+
 
             Box(
                 modifier = Modifier
 
                     .background(Color.White)
             ) {
+                AppPanel(
+                    viewModel = viewModel,
+                    onCategorySelected = { categoryId ->
+                        viewModel.setSelectedCategoryId(categoryId)
+                    },
+                    onSearchQueryChanged = { query ->
+                        viewModel.setSearchQuery(query)
+                    }
+                )
+
                 MyFabButton {
                     isDialogVisible = true
                 }
@@ -75,21 +106,16 @@ class MainActivity : ComponentActivity() {
                         },
                         context = LocalContext.current, viewModel = viewModel
                     )
+
+
                 }
 
                 // Отображение списка продуктов с передачей viewModel
                 ProductList(
-                    modifier = Modifier
-                    , products = productList, viewModel = viewModel
+                    modifier = Modifier, products = productList, viewModel = viewModel
                 )
                 Log.d("DatabaseLog", "Saving product: $productList")
             }
         }
     }
 }
-
-
-
-
-
-
