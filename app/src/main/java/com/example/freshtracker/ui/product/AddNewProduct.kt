@@ -191,36 +191,20 @@ fun AddNewProduct(
                             } catch (e: Exception) {
                                 Log.e("ErrorLog", "An error occurred: ${e.message}", e)
                             }
-                        },
-                        modifier = Modifier.padding(8.dp),
-                    ) {
-                        Text("Отменить")
-                    }
-
-                    TextButton(
-                        onClick = {
-                            onConfirmation(
-                                productText.text,
-                                selectedCategory?.id ?: 0,
-                                expirationText.text
-                            )
-
-                            // Сохранение в базу данных с использованием Room
-                            // Обновление списка продуктов и вызов колбэка
-                            viewModel.insertProduct(
-                                Product(
-                                    name = productText.text,
-                                    categoryId = selectedCategory?.id ?: 0,
-                                    expirationDate = SimpleDateFormat(
-                                        "ddMMyyyy",
-                                        Locale.getDefault()
-                                    ).parse(expirationText.text) ?: Date()
-                                )
-                            )
+                            onDismissRequest()
                         },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Text("Сохранить")
+                    }
+
+                    TextButton(
+                        onClick = {
+                            onDismissRequest()
+                        },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Отменить")
                     }
                 }
             }
