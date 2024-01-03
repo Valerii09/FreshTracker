@@ -7,8 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,12 +29,6 @@ import com.example.freshtracker.viewModel.ProductViewModelFactory
 
 class MainActivity : ComponentActivity() {
     private val viewModel: ProductViewModel by viewModels()
-    private val productDao: ProductDao by lazy {
-        AppDatabase.getDatabase(applicationContext).productDao()
-    }
-    private val productViewModel: ProductViewModel by viewModels {
-        ProductViewModelFactory(ProductRepository(productDao))
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +67,7 @@ class MainActivity : ComponentActivity() {
                             isDialogVisible = false
                         },
                         onConfirmation = { name, category, expirationDate ->
+                            isDialogVisible = false
                         },
                         onProductListUpdate = { updatedList ->
                             // Обновление списка продуктов после изменения

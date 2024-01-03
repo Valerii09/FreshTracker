@@ -215,5 +215,4 @@ fun EditProduct(
             }
         }
     }
-
 }

@@ -173,10 +173,12 @@ fun AddNewProduct(
 
                                     // Добавляем проверку на корректность формата даты перед сохранением
                                     if (isValidDate(expirationText.text)) {
+
                                         onConfirmation(
                                             productText.text,
                                             selectedCategory?.id ?: 0,
                                             SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(it)
+
                                         )
 
                                         // Сохранение в базу данных с использованием Room
@@ -187,8 +189,9 @@ fun AddNewProduct(
                                                 categoryId = selectedCategory?.id ?: 0,
                                                 expirationDate = it
                                             )
+
                                         )
-                                        onDismissRequest
+
                                     } else {
                                         // Формат даты некорректный - выводите сообщение об ошибке или предпримите другие действия
                                         Log.d("DateLog", "Invalid date format")
