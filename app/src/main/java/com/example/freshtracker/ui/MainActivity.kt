@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.freshtracker.data.AppDatabase
 import com.example.freshtracker.data.ProductDao
@@ -74,13 +75,12 @@ class MainActivity : ComponentActivity() {
                             isDialogVisible = false
                         },
                         onConfirmation = { name, category, expirationDate ->
-                            isDialogVisible = false
                         },
                         onProductListUpdate = { updatedList ->
                             // Обновление списка продуктов после изменения
                             productList = updatedList
                         },
-                        viewModel = viewModel
+                        context = LocalContext.current, viewModel = viewModel
                     )
                 }
 

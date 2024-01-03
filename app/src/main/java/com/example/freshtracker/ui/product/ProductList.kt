@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.freshtracker.model.Product
 import com.example.freshtracker.viewModel.ProductViewModel
@@ -40,7 +41,7 @@ fun ProductList(products: List<Product>, viewModel: ProductViewModel, modifier: 
                     onConfirmation = { editedProduct ->
                         showDialog = false
                     },
-                    viewModel = viewModel
+                    context = LocalContext.current, viewModel = viewModel
                 )
             }
         }

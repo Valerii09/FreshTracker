@@ -1,6 +1,7 @@
 package com.example.freshtracker.ui.product
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -44,7 +45,7 @@ import com.example.freshtracker.viewModel.ProductViewModel
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
-
+import android.content.Context
 
 @Composable
 fun EditProduct(
@@ -52,6 +53,7 @@ fun EditProduct(
     onDismissRequest: () -> Unit,
     onConfirmation: (Product) -> Unit,
     viewModel: ProductViewModel,
+    context: Context,
 ) {
     val expirationDateTransformation = ExpirationDateVisualTransformation()
     var editedProduct by remember { mutableStateOf(product.copy()) }
@@ -168,7 +170,6 @@ fun EditProduct(
                         onClick = {
                             try {
                                 val expirationDate = try {
-                                    Log.d("DateLog", "Entered Date: ${expirationText.text}")
                                     // Проверяем формат даты
                                     if (isValidDate(expirationText.text)) {
                                         val dateFormat = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
@@ -196,8 +197,10 @@ fun EditProduct(
                                 } ?: run {
                                     Log.d("DateLog", "Expiration Date is null")
                                     // Обработка ошибки ввода неверного формата даты
-                                    // Можно добавить визуальное оповещение пользователю
-                                    // или другую логику обработки ошибки
+                                    // Вывод сообщения об ошибке пользователю
+                                    Toast.makeText(context, "Неверный формат даты", Toast.LENGTH_SHORT).show()
+
+
                                 }
                             } catch (e: Exception) {
                                 Log.e("ErrorLog", "An error occurred: ${e.message}", e)
@@ -212,4 +215,5 @@ fun EditProduct(
             }
         }
     }
+
 }
