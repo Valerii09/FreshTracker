@@ -49,41 +49,33 @@ class MainActivity : ComponentActivity() {
             val productDao = database.productDao()
 
             var productList by remember { mutableStateOf(emptyList<Product>()) }
-
-
-            // Получение списка продуктов из базы данных
-            // В MainActivity
-            DisposableEffect(viewModel.selectedCategoryId, viewModel.searchQuery) {
-                val job = CoroutineScope(Dispatchers.Default).launch {
-                    productDao.getFilteredProducts(
-                        viewModel.selectedCategoryId.value,
-                        viewModel.searchQuery.value
-                    ).collect { products ->
-                        productList = products
-                        Log.d("ProductDao", "Filtered products: $products")
-                    }
-                }
-
-                onDispose {
-                    job.cancel()
-                }
-            }
-
+            var searchQuery by remember { mutableStateOf("") }
 
             Box(
                 modifier = Modifier
 
                     .background(Color.White)
             ) {
-                AppPanel(
-                    viewModel = viewModel,
-                    onCategorySelected = { categoryId ->
-                        viewModel.setSelectedCategoryId(categoryId)
-                    },
-                    onSearchQueryChanged = { query ->
-                        viewModel.setSearchQuery(query)
+                AppPanel(viewModel = viewModel, onCategorySelected = { categoryId ->
+                    viewModel.setSelectedCategoryId(categoryId)
+                }, onSearchQueryChanged = { query ->
+                    // Обновляем значение поискового запроса
+                    searchQuery = query ?: ""
+                })
+                DisposableEffect(searchQuery) {
+                    val job = CoroutineScope(Dispatchers.Default).launch {
+                        productDao.getFilteredProducts(
+                            viewModel.selectedCategoryId.value, searchQuery
+                        ).collect { products ->
+                            productList = products
+                            Log.d("ProductDao", "Filtered products: $products")
+                        }
                     }
-                )
+
+                    onDispose {
+                        job.cancel()
+                    }
+                }
 
                 MyFabButton {
                     isDialogVisible = true
@@ -96,18 +88,13 @@ class MainActivity : ComponentActivity() {
 
                         onDismissRequest = {
                             isDialogVisible = false
-                        },
-                        onConfirmation = { name, category, expirationDate ->
+                        }, onConfirmation = { name, category, expirationDate ->
                             isDialogVisible = false
-                        },
-                        onProductListUpdate = { updatedList ->
+                        }, onProductListUpdate = { updatedList ->
                             // Обновление списка продуктов после изменения
                             productList = updatedList
-                        },
-                        context = LocalContext.current, viewModel = viewModel
+                        }, context = LocalContext.current, viewModel = viewModel
                     )
-
-
                 }
 
                 // Отображение списка продуктов с передачей viewModel
