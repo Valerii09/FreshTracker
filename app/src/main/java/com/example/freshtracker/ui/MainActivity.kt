@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import com.example.freshtracker.data.AppDatabase
 import com.example.freshtracker.data.ProductDao
 import com.example.freshtracker.data.ProductRepository
@@ -63,12 +64,10 @@ class MainActivity : ComponentActivity() {
                     searchQuery = query ?: ""
                 })
                 DisposableEffect(searchQuery) {
-                    val job = CoroutineScope(Dispatchers.Default).launch {
-                        productDao.getFilteredProducts(
-                            viewModel.selectedCategoryId.value, searchQuery
-                        ).collect { products ->
+                    val job = lifecycleScope.launch {
+                        productDao.searchProductsByName(searchQuery).collect { products ->
                             productList = products
-                            Log.d("ProductDao", "Filtered products: $products")
+                            Log.d("ProductDao", "Filtered products by name: $products")
                         }
                     }
 
@@ -76,7 +75,6 @@ class MainActivity : ComponentActivity() {
                         job.cancel()
                     }
                 }
-
                 MyFabButton {
                     isDialogVisible = true
                 }

@@ -15,6 +15,10 @@ interface ProductDao {
     @Query("SELECT * FROM products WHERE (:categoryId IS NULL OR categoryId = :categoryId) AND (:searchQuery IS NULL OR LOWER(name) LIKE '%' || LOWER(:searchQuery) || '%')")
     fun getFilteredProducts(categoryId: Int?, searchQuery: String?): Flow<List<Product>>
 
+    @Query("SELECT * FROM products WHERE LOWER(name) LIKE '%' || LOWER(:searchQuery) || '%'")
+    fun searchProductsByName(searchQuery: String?): Flow<List<Product>>
+
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertProduct(product: Product)
 

@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,12 +25,14 @@ import com.example.freshtracker.viewModel.ProductViewModel
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun ProductList(products: List<Product>, viewModel: ProductViewModel, modifier: Modifier) {
+    val searchQuery = viewModel.searchQuery.collectAsState().value
+
     LazyColumn(
         modifier = modifier.padding(top = 100.dp, bottom = 115.dp)
     ) {
         itemsIndexed(products) { index, product ->
-            if (viewModel.searchQuery.value.isNullOrBlank() ||
-                product.name.contains(viewModel.searchQuery.value!!, ignoreCase = true)
+            if (searchQuery.isNullOrBlank() ||
+                product.name.contains(searchQuery, ignoreCase = true)
             ) {
                 var showDialog by remember { mutableStateOf(false) }
                 Log.d("ProductList", "Displaying product at index $index: $product")

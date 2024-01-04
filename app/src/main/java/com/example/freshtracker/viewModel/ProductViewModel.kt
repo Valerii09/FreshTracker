@@ -109,6 +109,7 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
     fun filterByCategoryAndDate(categoryId: Int?, date: LocalDate?) {
         _selectedCategoryId.value = categoryId
         _selectedDate.value = date
+        _searchQuery.value = null // Сбрасываем поиск при изменении фильтров
     }
 
     fun resetFilters() {
