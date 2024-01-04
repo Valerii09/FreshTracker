@@ -1,5 +1,6 @@
 package com.example.freshtracker.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -34,12 +35,21 @@ import com.example.freshtracker.viewModel.ProductViewModel
 import com.example.freshtracker.viewModel.ProductViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMap
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
     private val viewModel: ProductViewModel by viewModels()
 
+    @SuppressLint("StateFlowValueCalledInComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -57,24 +67,76 @@ class MainActivity : ComponentActivity() {
 
                     .background(Color.White)
             ) {
-                AppPanel(viewModel = viewModel, onCategorySelected = { categoryId ->
-                    viewModel.setSelectedCategoryId(categoryId)
-                }, onSearchQueryChanged = { query ->
-                    // Обновляем значение поискового запроса
-                    searchQuery = query ?: ""
-                })
-                DisposableEffect(searchQuery) {
-                    val job = lifecycleScope.launch {
-                        productDao.searchProductsByName(searchQuery).collect { products ->
-                            productList = products
-                            Log.d("ProductDao", "Filtered products by name: $products")
+                AppPanel(
+                    viewModel = viewModel,
+                    onCategorySelected = { categoryId ->
+                        Log.d("AppPanel", "Category selected: $categoryId")
+                        viewModel.setSelectedCategoryId(categoryId)
+                    },
+                    onSearchQueryChanged = { query ->
+                        lifecycleScope.launch {
+                            combine(
+                                viewModel.selectedCategoryId,
+                                MutableStateFlow(query)
+                            ) { categoryId, searchQuery ->
+                                Pair(categoryId, searchQuery)
+                            }
+                                .distinctUntilChanged()
+                                .collect { (categoryId, searchQuery) ->
+                                    Log.d("AppPanel", "Collecting with categoryId: $categoryId, searchQuery: $searchQuery")
+
+                                    val products = if (categoryId == null || categoryId == -1) {
+                                        // Если categoryId равен null или -1, применяем фильтр ко всем категориям
+                                        Log.d("AppPanel", "Applying filter for all categories...")
+                                        viewModel.getFilteredProducts(null, searchQuery).first()
+                                    } else if (searchQuery.isNullOrBlank()) {
+                                        // Если поисковый запрос пуст, применяем фильтр только по категории
+                                        Log.d("AppPanel", "Applying filter only by category...")
+                                        viewModel.getFilteredProducts(categoryId, null).first()
+                                    } else {
+                                        // Применяем фильтр и по категории, и по имени
+                                        Log.d("AppPanel", "Applying filter by category and search query...")
+                                        viewModel.getFilteredProducts(categoryId, searchQuery).first()
+                                    }
+
+                                    Log.d("AppPanel", "Filtered products: $products")
+                                    productList = products
+                                }
                         }
                     }
+                )
+
+
+
+// Отменяем предыдущий job, если он существует
+                DisposableEffect(Unit) {
+                    val job = combine(
+                        viewModel.selectedCategoryId,
+                        viewModel.searchQuery
+                    ) { categoryId, searchQuery ->
+                        Pair(categoryId, searchQuery)
+                    }
+                        .distinctUntilChanged()
+                        .onEach { (categoryId, searchQuery) ->
+                            Log.d("AppPanel", "Collecting with categoryId: $categoryId, searchQuery: $searchQuery")
+
+                            // Применяем фильтр и по категории, и по имени
+                            val products = viewModel.getFilteredProducts(categoryId, searchQuery).first()
+
+                            Log.d("AppPanel", "Filtered products: $products")
+                            productList = products
+                        }
+                        .launchIn(lifecycleScope)
 
                     onDispose {
                         job.cancel()
                     }
                 }
+
+
+
+
+
                 MyFabButton {
                     isDialogVisible = true
                 }

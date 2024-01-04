@@ -59,14 +59,13 @@ fun AppPanel(
 
         // Панель фильтров
         FilterOptionsPanel(
-            viewModel,
-            onCategorySelected,
+            viewModel = viewModel,
+            onCategorySelected = onCategorySelected,
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f)
-                .padding(start = 8.dp) // Расстояние между поиском и фильтрами
+                .padding(start = 8.dp)
         )
     }
 }
-
 

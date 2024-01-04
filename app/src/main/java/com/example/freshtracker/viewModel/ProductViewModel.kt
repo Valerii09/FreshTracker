@@ -138,4 +138,5 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
             return AppDatabase.getDatabase(context).productDao()
         }
     }
+
 }

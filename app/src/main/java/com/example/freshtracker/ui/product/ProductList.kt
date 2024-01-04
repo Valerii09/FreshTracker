@@ -26,7 +26,7 @@ import com.example.freshtracker.viewModel.ProductViewModel
 @Composable
 fun ProductList(products: List<Product>, viewModel: ProductViewModel, modifier: Modifier) {
     val searchQuery = viewModel.searchQuery.collectAsState().value
-
+    Log.d("ProductList", "Products: $products, Search Query: $searchQuery")
     LazyColumn(
         modifier = modifier.padding(top = 100.dp, bottom = 115.dp)
     ) {
