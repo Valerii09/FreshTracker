@@ -49,6 +49,7 @@ fun AppPanel(
     ) {
         // Панель поиска
         SearchPanel(
+            viewModel,
             onSearchQueryChanged,
             modifier = Modifier
                 .fillMaxHeight()

@@ -13,10 +13,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.freshtracker.viewModel.ProductViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchPanel(
+    viewModel: ProductViewModel,
     onSearchQueryChanged: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -27,7 +29,7 @@ fun SearchPanel(
         onValueChange = {
             searchQuery = it
             onSearchQueryChanged(searchQuery)
-            Log.d("SearchPanel", "Search query changed: $searchQuery")
+            viewModel.searchProductsByName(searchQuery)
         },
         label = { Text("Поиск") },
         modifier = modifier
@@ -35,3 +37,4 @@ fun SearchPanel(
             .padding(start = 8.dp)
     )
 }
+
