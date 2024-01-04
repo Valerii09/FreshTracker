@@ -21,58 +21,115 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 class ProductViewModel(private val repository: ProductRepository) : ViewModel() {
-    private val _categoryStateFlow = MutableStateFlow<Category?>(null)
-    val categoryStateFlow: StateFlow<Category?> = _categoryStateFlow
 
-    fun updateProduct(product: Product) {
-        viewModelScope.launch {
-            repository.updateProduct(product)
-        }
-    }
-    fun deleteProduct(product: Product) {
-        viewModelScope.launch {
-            repository.deleteProduct(product)
-        }
-    }
+    // Состояние выбранной категории
+    private val _selectedCategoryId = MutableStateFlow<Int?>(null)
+    val selectedCategoryId: StateFlow<Int?> = _selectedCategoryId
 
+    // Состояние поискового запроса
+    private val _searchQuery = MutableStateFlow<String?>(null)
+    val searchQuery: StateFlow<String?> = _searchQuery
 
-    fun insertCategory(category: Category) {
-        viewModelScope.launch {
-            repository.insertCategory(category)
-        }
-    }
-    fun getAllCategories(): Flow<List<Category>> {
-        return repository.getAllCategories()
-    }
+    // Состояние выбранной даты
+    private val _selectedDate = MutableStateFlow<LocalDate?>(null)
+    val selectedDate: StateFlow<LocalDate?> = _selectedDate
 
+    // LiveData для всех продуктов
+    val allProducts: LiveData<List<Product>> = repository.getAllProducts().asLiveData()
+
+    // LiveData для всех категорий
+    val allCategories: LiveData<List<Category>> = repository.getAllCategories().asLiveData()
 
     // Конструктор без параметров для использования в ViewModelProvider
     @Suppress("unused")
     constructor() : this(ProductRepository(getDefaultProductDao(MyApp.getContext()))) {
         // Можете использовать дефолтные значения или заменить на подходящий код
     }
-    suspend fun getCategoryById(categoryId: Int): Category? {
-        return withContext(Dispatchers.IO) {
-            repository.getCategoryById(categoryId)
+
+    // Функция для получения отфильтрованных продуктов
+    fun getFilteredProducts(categoryId: Int?, searchQuery: String?): Flow<List<Product>> {
+        return repository.getFilteredProducts(categoryId, searchQuery)
+    }
+
+    // Функция для поиска продуктов по имени
+    fun searchProductsByName(searchQuery: String?): Flow<List<Product>> {
+        return repository.searchProductsByName(searchQuery)
+    }
+
+    // Функция для обновления продукта
+    fun updateProduct(product: Product) {
+        viewModelScope.launch {
+            repository.updateProduct(product)
         }
     }
-    // Получить все продукты в виде LiveData
-    val allProducts: LiveData<List<Product>> = repository.getAllProducts().asLiveData()
 
-    // Вставить продукт
+    // Функция для удаления продукта
+    fun deleteProduct(product: Product) {
+        viewModelScope.launch {
+            repository.deleteProduct(product)
+        }
+    }
+
+    // Функция для вставки новой категории
+    fun insertCategory(category: Category) {
+        viewModelScope.launch {
+            repository.insertCategory(category)
+        }
+    }
+
+    // Функция для вставки нового продукта
     fun insertProduct(product: Product) {
         viewModelScope.launch {
             repository.insertProduct(product)
         }
     }
 
-    // Получить все продукты в виде Flow
+    // Функция для получения всех категорий
+    fun getAllCategories(): Flow<List<Category>> {
+        return repository.getAllCategories()
+    }
+
+    // Функция для получения всех продуктов в виде Flow
     fun getAllProducts(): Flow<List<Product>> {
         return repository.getAllProducts()
     }
 
-    // Получить все категории в виде LiveData
-    val allCategories: LiveData<List<Category>> = repository.getAllCategories().asLiveData()
+    // Функция для получения категории по идентификатору
+    suspend fun getCategoryById(categoryId: Int): Category? {
+        return withContext(Dispatchers.IO) {
+            repository.getCategoryById(categoryId)
+        }
+    }
+
+    // Функция для установки выбранной категории
+    fun setSelectedCategoryId(categoryId: Int?) {
+        _selectedCategoryId.value = categoryId
+    }
+
+    // Функция для установки поискового запроса
+    fun setSearchQuery(query: String?) {
+        _searchQuery.value = query
+        Log.d("SearchPanel", "Search query set: $query")
+    }
+
+    // Функция для установки выбранной даты
+    fun setSelectedDate(date: LocalDate?) {
+        _selectedDate.value = date
+    }
+
+    // Функция для фильтрации по категории и дате
+    fun filterByCategoryAndDate(categoryId: Int?, date: LocalDate?) {
+        _selectedCategoryId.value = categoryId
+        _selectedDate.value = date
+        _searchQuery.value = null // Сбрасываем поиск при изменении фильтров
+    }
+
+    // Функция для сброса всех фильтров
+    fun resetFilters() {
+        _selectedCategoryId.value = null
+        _selectedDate.value = null
+        _searchQuery.value = null
+    }
 
     companion object {
         // Пример метода для создания инстанса ProductDao (замените на свой собственный код)
@@ -81,41 +138,4 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
             return AppDatabase.getDatabase(context).productDao()
         }
     }
-
-    // Новые переменные состояния для фильтрации и поиска
-    private val _selectedCategoryId = MutableStateFlow<Int?>(null)
-    val selectedCategoryId: StateFlow<Int?> = _selectedCategoryId
-
-    private val _searchQuery = MutableStateFlow<String?>(null)
-    val searchQuery: StateFlow<String?> = _searchQuery
-
-    // Функции для обновления состояний
-    fun setSelectedCategoryId(categoryId: Int?) {
-        _selectedCategoryId.value = categoryId
-    }
-
-    fun setSearchQuery(query: String?) {
-        _searchQuery.value = query
-        Log.d("SearchPanel", "Search query set: $query")
-    }
-
-    private val _selectedDate = MutableStateFlow<LocalDate?>(null)
-    val selectedDate: StateFlow<LocalDate?> = _selectedDate
-
-    fun setSelectedDate(date: LocalDate?) {
-        _selectedDate.value = date
-    }
-
-    fun filterByCategoryAndDate(categoryId: Int?, date: LocalDate?) {
-        _selectedCategoryId.value = categoryId
-        _selectedDate.value = date
-        _searchQuery.value = null // Сбрасываем поиск при изменении фильтров
-    }
-
-    fun resetFilters() {
-        _selectedCategoryId.value = null
-        _selectedDate.value = null
-        _searchQuery.value = null
-    }
 }
-

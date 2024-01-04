@@ -26,4 +26,13 @@ class ProductRepository(private val productDao: ProductDao) {
         productDao.deleteProduct(product)
     }
 
+    // Добавленные функции для выполнения запросов к базе данных
+    fun getFilteredProducts(categoryId: Int?, searchQuery: String?): Flow<List<Product>> {
+        return productDao.getFilteredProducts(categoryId, searchQuery)
+    }
+
+    fun searchProductsByName(searchQuery: String?): Flow<List<Product>> {
+        return productDao.searchProductsByName(searchQuery)
+    }
 }
+
