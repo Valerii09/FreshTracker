@@ -45,6 +45,7 @@ fun FilterOptionsPanel(
     var searchQuery by remember { mutableStateOf("") }
     var resetFilter by remember { mutableStateOf(false) }
 
+
     // Добавляем категорию "Все категории" в начало списка
     var categories: List<Category> by remember { mutableStateOf(emptyList()) }
     LaunchedEffect(viewModel.getAllCategories()) {

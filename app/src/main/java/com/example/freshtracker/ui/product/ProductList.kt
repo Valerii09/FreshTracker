@@ -25,9 +25,13 @@ import com.example.freshtracker.viewModel.ProductViewModel
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun ProductList(products: List<Product>, viewModel: ProductViewModel, modifier: Modifier) {
-    val searchQuery = viewModel.searchQuery.collectAsState().value
+    val searchQueryState = viewModel.searchQuery.collectAsState()
+    val searchQuery = searchQueryState.value
+
+    Log.d("ProductList", "ProductList recomposed with products: $products")
     Log.d("ProductList", "Products: $products, Search Query: $searchQuery")
     LazyColumn(
+
         modifier = modifier.padding(top = 100.dp, bottom = 115.dp)
     ) {
         itemsIndexed(products) { index, product ->

@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMap
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -70,68 +71,23 @@ class MainActivity : ComponentActivity() {
                 AppPanel(
                     viewModel = viewModel,
                     onCategorySelected = { categoryId ->
-                        Log.d("AppPanel", "Category selected: $categoryId")
+                        Log.d("MainActivity", "Category selected: $categoryId")
                         viewModel.setSelectedCategoryId(categoryId)
                     },
+
                     onSearchQueryChanged = { query ->
-                        lifecycleScope.launch {
-                            combine(
-                                viewModel.selectedCategoryId,
-                                MutableStateFlow(query)
-                            ) { categoryId, searchQuery ->
-                                Pair(categoryId, searchQuery)
-                            }
-                                .distinctUntilChanged()
-                                .collect { (categoryId, searchQuery) ->
-                                    Log.d("AppPanel", "Collecting with categoryId: $categoryId, searchQuery: $searchQuery")
-
-                                    val products = if (categoryId == null || categoryId == -1) {
-                                        // Если categoryId равен null или -1, применяем фильтр ко всем категориям
-                                        Log.d("AppPanel", "Applying filter for all categories...")
-                                        viewModel.getFilteredProducts(null, searchQuery).first()
-                                    } else if (searchQuery.isNullOrBlank()) {
-                                        // Если поисковый запрос пуст, применяем фильтр только по категории
-                                        Log.d("AppPanel", "Applying filter only by category...")
-                                        viewModel.getFilteredProducts(categoryId, null).first()
-                                    } else {
-                                        // Применяем фильтр и по категории, и по имени
-                                        Log.d("AppPanel", "Applying filter by category and search query...")
-                                        viewModel.getFilteredProducts(categoryId, searchQuery).first()
-                                    }
-
-                                    Log.d("AppPanel", "Filtered products: $products")
-                                    productList = products
-                                }
-                        }
+                        Log.d("MainActivity", "Search query changed: $query")
+                    },
+                    onSearchResultsChanged = { searchResults ->
+                        // Обновление списка продуктов в AppPanel
+                        productList = searchResults
+                        Log.d("MainActivity", "Search query changed: $productList")
                     }
                 )
 
 
 
-// Отменяем предыдущий job, если он существует
-                DisposableEffect(Unit) {
-                    val job = combine(
-                        viewModel.selectedCategoryId,
-                        viewModel.searchQuery
-                    ) { categoryId, searchQuery ->
-                        Pair(categoryId, searchQuery)
-                    }
-                        .distinctUntilChanged()
-                        .onEach { (categoryId, searchQuery) ->
-                            Log.d("AppPanel", "Collecting with categoryId: $categoryId, searchQuery: $searchQuery")
 
-                            // Применяем фильтр и по категории, и по имени
-                            val products = viewModel.getFilteredProducts(categoryId, searchQuery).first()
-
-                            Log.d("AppPanel", "Filtered products: $products")
-                            productList = products
-                        }
-                        .launchIn(lifecycleScope)
-
-                    onDispose {
-                        job.cancel()
-                    }
-                }
 
 
 
@@ -157,11 +113,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                // Отображение списка продуктов с передачей viewModel
-                ProductList(
-                    modifier = Modifier, products = productList, viewModel = viewModel
-                )
-                Log.d("DatabaseLog", "Saving product: $productList")
+
             }
         }
     }
