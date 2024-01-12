@@ -133,7 +133,7 @@ fun EditProduct(
                 BasicTextField(
                     value = expirationText,
                     onValueChange = { newExpirationText ->
-                        if (newExpirationText.text.length <= 8) {
+                        if (newExpirationText.text.all { it.isDigit() } && newExpirationText.text.length <= 8) {
                             expirationText = newExpirationText
                         }
                     },
@@ -143,12 +143,13 @@ fun EditProduct(
                         .padding(16.dp)
                         .background(color = Color.White)
                         .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(4.dp))
-                        .padding(8.dp)
-                    ,
-                    keyboardOptions = KeyboardOptions (keyboardType = KeyboardType.Number,
+                        .padding(8.dp),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.NumberPassword,
                     ),
                     visualTransformation = expirationDateTransformation
                 )
+
 
                 Spacer(modifier = Modifier.height(8.dp))
 
