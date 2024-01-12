@@ -1,5 +1,6 @@
 package com.example.freshtracker.ui.product
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,33 +25,70 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.freshtracker.model.Category
 import com.example.freshtracker.model.Product
+import com.example.freshtracker.ui.Notification.getExpirationDateColor
+import com.example.freshtracker.ui.Notification.isExpirationDateApproaching
+import com.example.freshtracker.ui.Notification.isExpirationDatePassed
+import com.example.freshtracker.ui.Notification.sendNotification
 import com.example.freshtracker.viewModel.ProductViewModel
+
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
 fun ProductItem(product: Product, viewModel: ProductViewModel, onEditClick: () -> Unit) {
-    // Используйте produceState для автоматического обновления Composable
+    val context = LocalContext.current
     var category by remember { mutableStateOf<Category?>(null) }
+    val expirationDate by rememberUpdatedState(newValue = product.expirationDate)
+
+    // Используем produceState для отслеживания состояния уведомления
+    val notificationState = produceState(initialValue = false) {
+        if (isExpirationDateApproaching(expirationDate)) {
+            value = true
+            // Отправить уведомление
+            sendNotification(context, "Приближается срок годности", "Срок годности продукта '${product.name}' заканчивается завтра.")
+        }
+    }
 
     // Используем LaunchedEffect для вызова getCategoryById из корутины
     LaunchedEffect(product.categoryId) {
         category = viewModel.getCategoryById(product.categoryId)
     }
+
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    val formattedDate = dateFormat.format(product.expirationDate)
+    val formattedDate = dateFormat.format(expirationDate)
+
+    // Цвет карточки
+    val cardColor = if (isExpirationDatePassed(expirationDate)) {
+        Color.Red // Используйте нужный цвет для истекшего срока годности
+    } else if (notificationState.value) {
+        Color(
+            255,
+            185,
+            55,
+            255
+        ) // Используйте нужный цвет для приближающегося срока годности
+    } else {
+        Color.White // Используйте нужный цвет для обычного состояния
+    }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .background(cardColor)
     ) {
         Row(
             modifier = Modifier
@@ -72,8 +110,15 @@ fun ProductItem(product: Product, viewModel: ProductViewModel, onEditClick: () -
                 // Категория
                 Text(text = "Категория: ${category?.name ?: "Unknown Category"}", modifier = Modifier.padding(bottom = 8.dp))
 
-                // Срок годности
-                Text(text = "Срок годности: $formattedDate")
+                // Срок годности с изменением цвета текста
+                val expirationDateColor = getExpirationDateColor(expirationDate)
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = expirationDateColor)) {
+                            append("Срок годности: $formattedDate")
+                        }
+                    }
+                )
             }
 
             // Правая колонка
@@ -108,7 +153,3 @@ fun ProductItem(product: Product, viewModel: ProductViewModel, onEditClick: () -
         }
     }
 }
-
-
-
-
