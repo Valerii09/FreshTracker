@@ -1,4 +1,4 @@
-package com.example.freshtracker.ui.Notification
+package com.example.freshtracker.Notification
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color

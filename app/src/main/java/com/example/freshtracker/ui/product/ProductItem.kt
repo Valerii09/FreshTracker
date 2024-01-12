@@ -38,10 +38,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.freshtracker.model.Category
 import com.example.freshtracker.model.Product
-import com.example.freshtracker.ui.Notification.getExpirationDateColor
-import com.example.freshtracker.ui.Notification.isExpirationDateApproaching
-import com.example.freshtracker.ui.Notification.isExpirationDatePassed
-import com.example.freshtracker.ui.Notification.sendNotification
+import com.example.freshtracker.Notification.getExpirationDateColor
+import com.example.freshtracker.Notification.isExpirationDateApproaching
+import com.example.freshtracker.Notification.isExpirationDatePassed
+import com.example.freshtracker.Notification.sendNotification
 import com.example.freshtracker.viewModel.ProductViewModel
 
 import java.text.SimpleDateFormat
