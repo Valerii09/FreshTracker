@@ -6,13 +6,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.icons.Icons
+
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -32,8 +37,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.time.LocalDate
+import androidx.compose.material.icons.filled.Filter
+import androidx.compose.material.icons.filled.Filter1
+import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.ui.tooling.preview.Preview
 
-// Вызывается при инициализации Composable
+
 @Composable
 fun FilterOptionsPanel(
     viewModel: ProductViewModel,
@@ -44,7 +54,6 @@ fun FilterOptionsPanel(
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
     var searchQuery by remember { mutableStateOf("") }
     var resetFilter by remember { mutableStateOf(false) }
-
 
     // Добавляем категорию "Все категории" в начало списка
     var categories: List<Category> by remember { mutableStateOf(emptyList()) }
@@ -68,7 +77,6 @@ fun FilterOptionsPanel(
         }
     }
 
-
     Column(
         modifier = modifier
             .fillMaxHeight()
@@ -78,14 +86,15 @@ fun FilterOptionsPanel(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Кнопка для открытия/закрытия выпадающего меню с категориями
-            Button(
+            // Заменяем Button на IconButton
+            IconButton(
                 onClick = {
                     isMenuExpanded = !isMenuExpanded
                 },
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Фильтр")
+                // Используем значок фильтра из Icons
+                Icon(imageVector = Icons.Default.FilterList, contentDescription = "Фильтр")
             }
 
             // Выпадающее меню с категориями
@@ -110,6 +119,25 @@ fun FilterOptionsPanel(
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FilterOptionsPanelPreview() {
+    // Создаем ViewModel (здесь вы можете использовать вашу реальную реализацию ProductViewModel)
+    val viewModel = ProductViewModel(/* передайте необходимые зависимости */)
+
+    // Фиктивная функция, которая будет вызвана при выборе категории
+    val onCategorySelected: (Int?) -> Unit = { categoryId ->
+        // Ваш код обработки выбора категории
+    }
+
+    // Предварительный просмотр панели фильтров
+    FilterOptionsPanel(
+        viewModel = viewModel,
+        onCategorySelected = onCategorySelected,
+        modifier = Modifier.fillMaxSize() // Здесь вы можете настроить размер и другие параметры
+    )
 }
 
 

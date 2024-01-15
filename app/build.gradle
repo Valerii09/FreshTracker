@@ -50,6 +50,9 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.compose.material:material-icons-core:1.0.0'
+    implementation 'androidx.compose.material:material-icons-extended:1.0.0'
+
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
 
     implementation "androidx.lifecycle:lifecycle-livedata:2.3.1"
