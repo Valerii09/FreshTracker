@@ -3,47 +3,33 @@ package com.example.freshtracker.ui.appPanel
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
-import com.example.freshtracker.model.Category
+import com.example.freshtracker.data.AppDatabase
+import com.example.freshtracker.data.ProductRepository
 import com.example.freshtracker.model.Product
 import com.example.freshtracker.ui.product.ProductList
 import com.example.freshtracker.viewModel.ProductViewModel
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.toList
-import java.time.LocalDate
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -58,8 +44,7 @@ fun AppPanel(
 
     DisposableEffect(viewModel.selectedCategoryId, viewModel.searchQuery) {
         val job = combine(
-            viewModel.selectedCategoryId,
-            viewModel.searchQuery
+            viewModel.selectedCategoryId, viewModel.searchQuery
         ) { categoryId, searchQuery ->
             Pair(categoryId, searchQuery)
         }.flatMapLatest { (categoryId, searchQuery) ->
@@ -86,22 +71,23 @@ fun AppPanel(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(90.dp)
+            .height(IntrinsicSize.Min) // Используйте IntrinsicSize.Min для автоматического подбора высоты
             .background(Color.Gray)
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
         // Панель поиска
-        val searchResults =  SearchPanel(
-            viewModel = viewModel,
-            onSearchQueryChanged = {
+        val searchResults = SearchPanel(
+            viewModel = viewModel, onSearchQueryChanged = {
 
                 onSearchQueryChanged(it)
             },
 
             modifier = Modifier
+                .background(Color.Gray)
+                .weight(5f)
+                .background(color = Color.White)
                 .fillMaxHeight()
-                .weight(1f)
-                .padding(end = 8.dp)
+
         )
         DisposableEffect(searchResults) {
             productList = searchResults
@@ -112,22 +98,51 @@ fun AppPanel(
 
         // Панель фильтров
         FilterOptionsPanel(
-            viewModel = viewModel,
-            onCategorySelected = {
+            viewModel = viewModel, onCategorySelected = {
                 // Добавим лог
                 onCategorySelected(it)
-            },
-            modifier = Modifier
+            }, modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f)
                 .padding(start = 8.dp)
+
         )
     }
 
     // Отображение списка продуктов с передачей viewModel
     ProductList(
-        modifier = Modifier,
-        products = productList,
-        viewModel = viewModel
+        modifier = Modifier, products = productList, viewModel = viewModel
+    )
+}
+
+
+@SuppressLint("StateFlowValueCalledInComposition")
+@Preview(showBackground = true)
+@Composable
+fun AppPanelPreview() {
+    // Создаем ViewModel с использованием настоящего ProductRepository и ProductDao
+    val viewModel = ProductViewModel(
+        ProductRepository(
+            AppDatabase.getDatabase(LocalContext.current).productDao()
+        )
+    )
+
+    // Фиктивные обработчики для просмотра
+    val onCategorySelected: (Int?) -> Unit = { categoryId ->
+        // Ваш код обработки выбора категории
+    }
+    val onSearchQueryChanged: (String?) -> Unit = { searchQuery ->
+        // Ваш код обработки изменения запроса поиска
+    }
+    val onSearchResultsChanged: (List<Product>) -> Unit = { searchResults ->
+        // Ваш код обработки изменения результатов поиска
+    }
+
+    // Предварительный просмотр AppPanel
+    AppPanel(
+        viewModel = viewModel,
+        onCategorySelected = onCategorySelected,
+        onSearchQueryChanged = onSearchQueryChanged,
+        onSearchResultsChanged = onSearchResultsChanged
     )
 }

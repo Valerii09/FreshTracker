@@ -93,6 +93,7 @@ fun ProductItem(product: Product, viewModel: ProductViewModel, onEditClick: () -
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

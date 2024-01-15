@@ -1,23 +1,38 @@
 package com.example.freshtracker.ui.appPanel
 
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import com.example.freshtracker.data.AppDatabase
 import com.example.freshtracker.data.ProductRepository
@@ -33,6 +48,7 @@ fun SearchPanel(
     onSearchQueryChanged: (String?) -> Unit,
     modifier: Modifier = Modifier
 ): List<Product> {
+    var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var searchResults by remember { mutableStateOf<List<Product>>(emptyList()) }
 
@@ -49,19 +65,20 @@ fun SearchPanel(
         }
     }
 
-    TextField(
+    MyTextField(
         value = searchQuery,
         onValueChange = {
             searchQuery = it
             onSearchQueryChanged(searchQuery)
         },
-        label = { Text("Поиск") },
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 8.dp),
-        singleLine = true,
-        maxLines = 1
+        visualTransformation = if (isSearchActive) {
+            PasswordVisualTransformation()
+        } else {
+            VisualTransformation.None
+        }// Установите, если текстовое поле находится в состоянии ошибки
     )
+
+
 
     return searchResults
 }
