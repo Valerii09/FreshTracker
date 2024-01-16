@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -51,6 +52,7 @@ fun SearchPanel(
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var searchResults by remember { mutableStateOf<List<Product>>(emptyList()) }
+    val focusManager = LocalFocusManager.current
 
     DisposableEffect(searchQuery) {
         val job = viewModel.searchProductsByName(searchQuery)
@@ -71,17 +73,29 @@ fun SearchPanel(
             searchQuery = it
             onSearchQueryChanged(searchQuery)
         },
+        onClearClick = {
+            // Обработчик для расфокусировки при нажатии на крестик
+            focusManager.clearFocus()
+            Log.d("SearchPanel", "Cleared searchQuery. Focused: ${focusManager}")
+        },
+        onBackspaceClick = {
+            Log.d("SearchPanel", "searchQuery: ${searchQuery.isBlank()}")
+            // Обработчик для расфокусировки при удалении последнего символа
+            if (searchQuery.isBlank()) {
+                focusManager.clearFocus()
+                Log.d("SearchPanel", "Cleared searchQuery12. Focused: ${focusManager}")
+            }
+        },
         visualTransformation = if (isSearchActive) {
             PasswordVisualTransformation()
         } else {
             VisualTransformation.None
-        }// Установите, если текстовое поле находится в состоянии ошибки
+        }
     )
-
-
 
     return searchResults
 }
+
 
 @Preview(showBackground = true)
 @Composable

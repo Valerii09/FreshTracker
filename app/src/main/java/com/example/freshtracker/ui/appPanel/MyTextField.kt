@@ -56,18 +56,20 @@ import androidx.compose.ui.unit.sp
 
 import com.google.accompanist.insets.LocalWindowInsets
 
-@OptIn(ExperimentalComposeUiApi::class)
+
+
 @ExperimentalMaterial3Api
 @Composable
 fun MyTextField(
     value: String,
     onValueChange: (String) -> Unit,
+    onClearClick: () -> Unit,
+    onBackspaceClick: () -> Unit,
     isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     var isFocused by remember { mutableStateOf(false) }
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val context = LocalContext.current
+    var wasNotEmpty by remember { mutableStateOf(false) } // Новое состояние для отслеживания был ли введен символ
 
     val colors: TextFieldColors = TextFieldDefaults.textFieldColors(
         containerColor = Color.White
@@ -76,17 +78,26 @@ fun MyTextField(
     OutlinedTextField(
         value = value,
         onValueChange = {
-            val wasEmpty = value.isEmpty()
+            val wasEmpty = value.isBlank()
             onValueChange(it)
 
+            if (wasEmpty && it.isNotBlank()) {
+                // Если поле было пустым и введен новый символ, устанавливаем флаг
+                wasNotEmpty = true
+            }
+
             if (wasEmpty && it.isEmpty()) {
-                // Сбросить фокус и скрыть клавиатуру, если значение стало пустым после изменения
+                // Сбросить фокус, не скрывая клавиатуру, если значение стало пустым после изменения
                 isFocused = false
-                keyboardController?.hide()
-                Log.d("MyTextField", "TextField is focused: $isFocused")
+                wasNotEmpty = false // Сбрасываем флаг, так как поле теперь пустое
             }
 
             Log.d("MyTextField", "Text in TextField: $it")
+
+            if (wasNotEmpty && it.isBlank()) {
+                // Если был введен символ и поле стало пустым, вызываем обработчик для расфокусировки
+                onBackspaceClick()
+            }
         },
         modifier = Modifier
             .onFocusChanged {
@@ -95,8 +106,7 @@ fun MyTextField(
             }
             .onGloballyPositioned { layoutCoordinates ->
                 if (value.isEmpty()) {
-                    // Если значение пусто, скрываем клавиатуру
-                    keyboardController?.hide()
+                    // Если значение пусто, не скрываем клавиатуру
                 }
             }
             .background(color = Color.Transparent),
@@ -121,13 +131,15 @@ fun MyTextField(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Done
         ),
+        singleLine = true, // Добавлен параметр для одной строки
         trailingIcon = {
-            if (value.isNotEmpty()) {
+            if (isFocused) {
                 Icon(
                     imageVector = Icons.Outlined.Clear,
                     contentDescription = null,
                     modifier = Modifier.clickable {
-                        onValueChange("")
+                        onValueChange("") // Очистка поля
+                        onClearClick() // Добавлен вызов обработчика для расфокусировки
                     }
                 )
             } else {
@@ -137,20 +149,7 @@ fun MyTextField(
                 )
             }
         }
+
     )
 }
 
-
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-@Preview
-fun MyTextFieldPreview() {
-
-        MyTextField(
-            value = "Hello, World!",
-            onValueChange = {}
-        )
-
-}
