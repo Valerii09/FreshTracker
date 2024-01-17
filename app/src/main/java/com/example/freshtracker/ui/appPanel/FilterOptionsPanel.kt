@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
@@ -78,15 +79,18 @@ fun FilterOptionsPanel(
 
     Column(
         modifier = modifier
+            .padding(top = 10.dp)
             .size(width = 30.dp, height = 40.dp)
     ) {
         Row(
             modifier = Modifier
+
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Box(
                 modifier = Modifier
+
             ) {
                 // Используем MaterialTheme для кастомизации стиля кнопки
                 IconButton(
@@ -114,8 +118,9 @@ fun FilterOptionsPanel(
                         isMenuExpanded = false
                     },
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface)
-                        .border(1.dp, MaterialTheme.colorScheme.onSurface)
+
+                        .background(Color.White)
+                        .border(1.dp, primaryColor)
                 ) {
                     categories.forEach { category ->
                         DropdownMenuItem(onClick = {

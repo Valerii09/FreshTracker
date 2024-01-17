@@ -32,7 +32,7 @@ fun ProductList(products: List<Product>, viewModel: ProductViewModel, modifier: 
     Log.d("ProductList", "Products: $products, Search Query: $searchQuery")
     LazyColumn(
 
-        modifier = modifier.padding(top = 100.dp, bottom = 115.dp)
+        modifier = modifier.padding(top = 80.dp, bottom = 115.dp)
     ) {
         itemsIndexed(products) { index, product ->
             if (searchQuery.isNullOrBlank() ||

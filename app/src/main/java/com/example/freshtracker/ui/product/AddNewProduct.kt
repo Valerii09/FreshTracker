@@ -101,7 +101,7 @@ fun AddNewProduct(
                         .padding(16.dp)
                         .background(color = Color.White)
                         .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(4.dp))
-                        .padding(8.dp)
+                        .padding(8.dp), singleLine = true
 
                 )
 

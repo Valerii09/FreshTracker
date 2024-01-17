@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.freshtracker.model.Category
+import com.example.freshtracker.ui.theme.primaryColor
 import com.example.freshtracker.viewModel.ProductViewModel
 
 
@@ -51,7 +52,7 @@ fun AddCategoryDialog(
 
         Card(
             modifier = Modifier
-                .fillMaxWidth()
+
                 .height(210.dp)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()), // добавлен Modifier.verticalScroll
@@ -59,8 +60,10 @@ fun AddCategoryDialog(
         ) {
             Column(
                 modifier = Modifier
+                    .background(Color.White)
+                    .border(1.dp, primaryColor)
                     .fillMaxSize()
-                    .padding(top = 10.dp),
+                    .padding(top = 23.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -76,9 +79,11 @@ fun AddCategoryDialog(
                         .background(color = Color.White)
                         .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(4.dp))
                         .padding(8.dp)
+                    , singleLine = true
                 )
                 Row(
                     modifier = Modifier
+
                         .padding(1.dp),
                     horizontalArrangement = Arrangement.Center,
                 ) {
@@ -86,7 +91,9 @@ fun AddCategoryDialog(
                         onClick = onDismissRequest,
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Отменить")
+                        Text("Отменить",
+                        color = Color.Black
+                        )
                     }
                     TextButton(
                         onClick = {
@@ -106,7 +113,8 @@ fun AddCategoryDialog(
                         },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Добавить")
+                        Text("Добавить",
+                            color = Color.Black)
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package com.example.freshtracker.ui.product
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -18,7 +19,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -41,11 +41,11 @@ import com.example.freshtracker.dateTime.ExpirationDateVisualTransformation
 import com.example.freshtracker.dateTime.isValidDate
 import com.example.freshtracker.model.Category
 import com.example.freshtracker.model.Product
+import com.example.freshtracker.ui.theme.primaryColor
 import com.example.freshtracker.viewModel.ProductViewModel
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
-import android.content.Context
 
 @Composable
 fun EditProduct(
@@ -57,7 +57,16 @@ fun EditProduct(
 ) {
     val expirationDateTransformation = ExpirationDateVisualTransformation()
     var editedProduct by remember { mutableStateOf(product.copy()) }
-    var expirationText by remember { mutableStateOf(TextFieldValue(SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(product.expirationDate))) }
+    var expirationText by remember {
+        mutableStateOf(
+            TextFieldValue(
+                SimpleDateFormat(
+                    "ddMMyyyy",
+                    Locale.getDefault()
+                ).format(product.expirationDate)
+            )
+        )
+    }
 
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
 
@@ -80,13 +89,15 @@ fun EditProduct(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(400.dp)
+                .height(408.dp)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()), // добавлен Modifier.verticalScroll
             shape = RoundedCornerShape(16.dp),
         ) {
             Column(
                 modifier = Modifier
+                    .background(Color.White)
+                    .border(1.dp, primaryColor)
                     .fillMaxSize()
                     .padding(top = 20.dp),
                 verticalArrangement = Arrangement.Center,
@@ -98,14 +109,16 @@ fun EditProduct(
                 Text("Название продукта:")
                 BasicTextField(
                     value = editedProduct.name,
-                    onValueChange = { newProductText -> editedProduct = editedProduct.copy(name = newProductText) },
+                    onValueChange = { newProductText ->
+                        editedProduct = editedProduct.copy(name = newProductText)
+                    },
                     textStyle = TextStyle(fontSize = 16.sp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                         .background(color = Color.White)
                         .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(4.dp))
-                        .padding(8.dp)
+                        .padding(8.dp), singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -117,8 +130,9 @@ fun EditProduct(
                 CategoryDropdownMenu(
                     categories = categories,
                     selectedCategory = selectedCategory,
-                    onCategorySelected = { selectedCategory = it
-                        },
+                    onCategorySelected = {
+                        selectedCategory = it
+                    },
                     onAddCategoryClicked = {
                         // Обработка нажатия на кнопку "Добавить свою категорию"
                         // В этом блоке вы можете вызвать дополнительные действия при добавлении категории
@@ -164,7 +178,8 @@ fun EditProduct(
                         },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Отменить")
+                        Text("Отменить",
+                        color = Color.Black)
                     }
 
                     TextButton(
@@ -173,9 +188,13 @@ fun EditProduct(
                                 val expirationDate = try {
                                     // Проверяем формат даты
                                     if (isValidDate(expirationText.text)) {
-                                        val dateFormat = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+                                        val dateFormat =
+                                            SimpleDateFormat("ddMMyyyy", Locale.getDefault())
                                         val parsedDate = dateFormat.parse(expirationText.text)
-                                        parsedDate ?: throw ParseException("Неверный формат даты", 0)
+                                        parsedDate ?: throw ParseException(
+                                            "Неверный формат даты",
+                                            0
+                                        )
                                     } else {
                                         throw ParseException("Неверный формат даты", 0)
                                     }
@@ -185,7 +204,15 @@ fun EditProduct(
                                 }
 
                                 expirationDate?.let {
-                                    Log.d("DateLog", "Formatted Date: ${SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(it)}")
+                                    Log.d(
+                                        "DateLog",
+                                        "Formatted Date: ${
+                                            SimpleDateFormat(
+                                                "ddMMyyyy",
+                                                Locale.getDefault()
+                                            ).format(it)
+                                        }"
+                                    )
                                     editedProduct = editedProduct.copy(
                                         expirationDate = it,
                                         categoryId = selectedCategory?.id ?: 0
@@ -199,7 +226,11 @@ fun EditProduct(
                                     Log.d("DateLog", "Expiration Date is null")
                                     // Обработка ошибки ввода неверного формата даты
                                     // Вывод сообщения об ошибке пользователю
-                                    Toast.makeText(context, "Неверный формат даты", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Неверный формат даты",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
 
 
                                 }
@@ -209,7 +240,8 @@ fun EditProduct(
                         },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Сохранить")
+                        Text("Сохранить",
+                            color = Color.Black)
                     }
 
                 }
