@@ -25,6 +25,7 @@ import com.example.freshtracker.data.AppDatabase
 import com.example.freshtracker.data.ProductRepository
 import com.example.freshtracker.model.Product
 import com.example.freshtracker.ui.product.ProductList
+import com.example.freshtracker.ui.theme.secondaryColor
 import com.example.freshtracker.viewModel.ProductViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -72,7 +73,7 @@ fun AppPanel(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min) // Используйте IntrinsicSize.Min для автоматического подбора высоты
-            .background(Color.Gray)
+            .background(secondaryColor)
             .padding(8.dp)
     ) {
         // Панель поиска
