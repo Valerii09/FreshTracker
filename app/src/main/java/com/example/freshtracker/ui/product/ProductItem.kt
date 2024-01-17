@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -29,6 +30,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
@@ -42,6 +45,7 @@ import com.example.freshtracker.Notification.getExpirationDateColor
 import com.example.freshtracker.Notification.isExpirationDateApproaching
 import com.example.freshtracker.Notification.isExpirationDatePassed
 import com.example.freshtracker.Notification.sendNotification
+import com.example.freshtracker.ui.theme.primaryColor
 import com.example.freshtracker.viewModel.ProductViewModel
 
 import java.text.SimpleDateFormat
@@ -81,7 +85,7 @@ fun ProductItem(product: Product, viewModel: ProductViewModel, onEditClick: () -
             255
         ) // Используйте нужный цвет для приближающегося срока годности
     } else {
-        Color.White // Используйте нужный цвет для обычного состояния
+        Color(0, 0 , 0 ,0 )// Используйте нужный цвет для обычного состояния
     }
 
     Card(
@@ -89,10 +93,14 @@ fun ProductItem(product: Product, viewModel: ProductViewModel, onEditClick: () -
             .fillMaxWidth()
             .padding(8.dp)
             .background(cardColor)
+            .shadow(10.dp)
+
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(Color.White)
+
 
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -103,20 +111,20 @@ fun ProductItem(product: Product, viewModel: ProductViewModel, onEditClick: () -
             ) {
                 // Название продукта
                 Text(
-                    text = "Название продукта: ${product.name}",
+                    text = "${product.name}",
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
                 // Категория
-                Text(text = "Категория: ${category?.name ?: "Unknown Category"}", modifier = Modifier.padding(bottom = 8.dp))
+                Text(text = "${category?.name ?: "Unknown Category"}", modifier = Modifier.padding(bottom = 8.dp))
 
                 // Срок годности с изменением цвета текста
                 val expirationDateColor = getExpirationDateColor(expirationDate)
                 Text(
                     text = buildAnnotatedString {
                         withStyle(style = SpanStyle(color = expirationDateColor)) {
-                            append("Срок годности: $formattedDate")
+                            append("Годен до $formattedDate")
                         }
                     }
                 )
@@ -134,6 +142,7 @@ fun ProductItem(product: Product, viewModel: ProductViewModel, onEditClick: () -
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit",
+                    tint = primaryColor,
                     modifier = Modifier
                         .size(24.dp)
                         .clickable { onEditClick() }
@@ -146,6 +155,7 @@ fun ProductItem(product: Product, viewModel: ProductViewModel, onEditClick: () -
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Delete",
+                    tint = primaryColor,
                     modifier = Modifier
                         .size(24.dp)
                         .clickable { viewModel.deleteProduct(product) }

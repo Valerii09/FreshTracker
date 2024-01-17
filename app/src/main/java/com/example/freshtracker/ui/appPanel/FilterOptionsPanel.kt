@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
@@ -34,6 +35,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.freshtracker.data.AppDatabase
 import com.example.freshtracker.data.ProductRepository
 import com.example.freshtracker.model.Category
+import com.example.freshtracker.ui.theme.primaryColor
 import com.example.freshtracker.viewModel.ProductViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -76,7 +78,7 @@ fun FilterOptionsPanel(
 
     Column(
         modifier = modifier
-            .fillMaxHeight()
+            .size(width = 30.dp, height = 40.dp)
     ) {
         Row(
             modifier = Modifier
@@ -98,7 +100,9 @@ fun FilterOptionsPanel(
                         Icon(
                             imageVector = Icons.Default.FilterList,
                             contentDescription = "Фильтр",
-                            tint = Color.White
+                            tint = primaryColor,
+                            modifier = Modifier
+                                .fillMaxSize()
                         )
                     }
                 )

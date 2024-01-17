@@ -1,5 +1,6 @@
 package com.example.freshtracker.ui.product
 
+
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -36,19 +37,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.freshtracker.data.AppDatabase
 import com.example.freshtracker.dateTime.ExpirationDateVisualTransformation
 import com.example.freshtracker.dateTime.isValidDate
-
-
 import com.example.freshtracker.model.Category
 import com.example.freshtracker.model.Product
 import com.example.freshtracker.viewModel.ProductViewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -90,7 +85,8 @@ fun AddNewProduct(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 20.dp),
+                    .background(Color.White)
+                    .padding(top = 34.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -117,10 +113,7 @@ fun AddNewProduct(
                     categories = categories,
                     selectedCategory = selectedCategory,
                     onCategorySelected = { selectedCategory = it },
-                    onAddCategoryClicked = {
-                        // Обработка нажатия на кнопку "Добавить свою категорию"
-                        // В этом блоке вы можете вызвать дополнительные действия при добавлении категории
-                    },
+                    onAddCategoryClicked = {},
                     viewModel = viewModel,
                 )
 
@@ -145,11 +138,8 @@ fun AddNewProduct(
                     ),
                     visualTransformation = expirationDateTransformation
                 )
-
-
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     TextButton(
@@ -158,9 +148,12 @@ fun AddNewProduct(
                                 val expirationDate = try {
                                     // Проверяем формат даты
                                     if (isValidDate(expirationText.text)) {
-                                        val dateFormat = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+                                        val dateFormat =
+                                            SimpleDateFormat("ddMMyyyy", Locale.getDefault())
                                         val parsedDate = dateFormat.parse(expirationText.text)
-                                        parsedDate ?: throw ParseException("Неверный формат даты", 0)
+                                        parsedDate ?: throw ParseException(
+                                            "Неверный формат даты", 0
+                                        )
                                     } else {
                                         throw ParseException("Неверный формат даты", 0)
                                     }
@@ -170,20 +163,17 @@ fun AddNewProduct(
                                 }
 
                                 expirationDate?.let {
-                                    Log.d("DateLog", "Formatted Date: ${SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(it)}")
-
-                                    // Добавляем проверку на корректность формата даты перед сохранением
                                     if (isValidDate(expirationText.text)) {
 
                                         onConfirmation(
                                             productText.text,
                                             selectedCategory?.id ?: 0,
-                                            SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(it)
+                                            SimpleDateFormat(
+                                                "ddMMyyyy", Locale.getDefault()
+                                            ).format(it)
 
                                         )
 
-                                        // Сохранение в базу данных с использованием Room
-                                        // Обновление списка продуктов и вызов колбэка
                                         viewModel.insertProduct(
                                             Product(
                                                 name = productText.text,
@@ -192,9 +182,7 @@ fun AddNewProduct(
                                             )
 
                                         )
-
                                     } else {
-                                        // Формат даты некорректный - выводите сообщение об ошибке или предпримите другие действия
                                         Log.d("DateLog", "Invalid date format")
 
                                         // Вывод сообщения об ошибке пользователю, например, Toast
@@ -202,19 +190,20 @@ fun AddNewProduct(
                                     }
                                 } ?: run {
                                     Log.d("DateLog", "Expiration Date is null")
-                                    // Обработка ошибки ввода неверного формата даты
-                                    // Можно добавить визуальное оповещение пользователю
-                                    // или другую логику обработки ошибки
-                                    Toast.makeText(context, "Неверный формат даты", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context, "Неверный формат даты", Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             } catch (e: Exception) {
                                 Log.e("ErrorLog", "An error occurred: ${e.message}", e)
                             }
 
                         },
-                        modifier = Modifier.padding(8.dp),
+                        modifier = Modifier.padding(8.dp)
+
                     ) {
-                        Text("Сохранить")
+                        Text("Сохранить",
+                            color = Color.Black)
                     }
 
                     TextButton(
@@ -223,33 +212,11 @@ fun AddNewProduct(
                         },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Отменить")
+                        Text("Отменить",
+                            color = Color.Black)
                     }
                 }
             }
         }
     }
 }
-
-
-//@Preview
-//@Composable
-//fun AddNewProductPreview() {
-//    val context = LocalContext.current
-//    var productList by remember { mutableStateOf(emptyList<Product>()) }
-//
-//    AddNewProduct(
-//        onDismissRequest = { /* Handle dismiss request */ },
-//        onConfirmation = { product, category, expiration ->
-//            /* Handle confirmation with the entered values */
-//            // Необходимо обновить productList для отображения нового продукта
-//            productList = productList + Product(name = product, category = category, expirationDate = expiration)
-//        },
-//        context = context,
-//        products = productList,
-//        onProductListUpdate = { updatedList ->
-//            // Обновить productList с обновленным списком продуктов
-//            productList = updatedList
-//        }
-//    )
-//}

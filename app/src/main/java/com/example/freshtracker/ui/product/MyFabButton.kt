@@ -1,5 +1,6 @@
 package com.example.freshtracker.ui.product
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,11 +18,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.freshtracker.ui.theme.primaryColor
 
 @Composable
 fun MyFabButton(onFabClick: () -> Unit) {
     Box(
+
         modifier = Modifier
+
             .fillMaxSize()
             .padding(20.dp)
     ) {
@@ -33,12 +37,12 @@ fun MyFabButton(onFabClick: () -> Unit) {
                 .clip(CircleShape)
                 .align(Alignment.BottomEnd)
                 .clickable { /* handle click here */ },
-            contentColor = Color.White
+            contentColor = Color.Black
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = "Добавить продукт",
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.background(primaryColor).fillMaxSize(),
                 tint = Color.White
             )
         }
